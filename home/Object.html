@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>three.js webgl - Spherical Panorama by Leonardo Galli & Tommaso Levato</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="http://marcoceppi.github.io/bootstrap-glyphicons/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            font-family: Monospace;
+            background-image: url("images/background.jpg");
+            margin: 0px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<span style="background-color:black; padding: 5px; opacity:0.5;"><i class="icon-large icon-zoom-in  icon-white"
+                                                                    onclick="zoomIn()"></i></span>
+<span style="background-color:black; padding: 5px; opacity:0.5;"><i class="icon-large icon-zoom-out  icon-white"
+                                                                    onclick="zoomOut()"></i></span>
+
+<div id="container"></div>
+<div id="info">MICC - Media Integration and Communication Center</div>
+
+<script type="text/javascript" src="jslibraries/three.min.js"></script>
+<script type="text/javascript" src="jslibraries/OBJMTLLoader.js"></script>
+<script type="text/javascript" src="jslibraries/MTLLoader.js"></script>
+<script type="text/javascript" src="jslibraries/jquery.min.js"></script>
+<script type="text/javascript" src="js/ajax.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+
+<script>
+    //arrow helper?
+    var camera, scene, renderer, mesh;
+    var objects = [];
+    var loader = new THREE.OBJMTLLoader();
+    var fov = 70,
+        plane,
+        isUserInteracting = false,
+        onMouseDownMouseX = 0, onMouseDownMouseY = 0,
+        lon = 0, onMouseDownLon = 0,
+        lat = 0, onMouseDownLat = 0,
+        phi = 0, theta = 0,
+        latLimit = -30,
+        projector,
+        minZoom = 100, maxZoom = 20,
+        interactiveObject,
+        onMouseDownObjectXRotation,
+        onMouseDownObjectYRotation,
+        onMouseDownObjectZRotation,
+        isRightClick = false;
+    init();
+    animate();
+    function init() {
+        loader.addEventListener('load', function (event) {
+            var object = event.content;
+            object.position.x = 20;
+            object.position.y = 0;
+            object.position.z = 0;
+            object.rotation.y = -Math.PI / 2;
+            var geometry = object.children[0].geometry;
+            THREE.GeometryUtils.center(geometry);
+            scene.add(object);
+            objects.push(object);
+        }, false);
+        camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1100);
+        camera.target = new THREE.Vector3(0, 0, 0);
+        scene = new THREE.Scene();
+        projector = new THREE.Projector();
+
+        var geometry = new THREE.PlaneGeometry(200, 200);
+        geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+        var material = new THREE.MeshBasicMaterial({color: 0xe0e0e0});
+        plane = new THREE.Mesh(geometry, material);
+        plane.position.set(17, 0, 0);
+        plane.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(plane);
+
+        var splitArray = window.location.search.split("=");
+        var objectId = splitArray[1];
+        var object = getContent("object", objectId);
+        loader.load('objects/' + object);
+
+        renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+        //shadow
+        var light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(0, 0, 0);
+        light.target.position.set(10, 0, 0);
+        scene.add(light);
+
+        var light1 = new THREE.DirectionalLight(0xffffff);
+        light1.position.set(2, 0, 0);
+        light1.target.position.set(10, 0, 0);
+        scene.add(light1);
+
+        var light2 = new THREE.DirectionalLight(0xffffff);
+        light2.position.set(-2, 0, 0);
+        light2.target.position.set(10, 0, 0);
+        scene.add(light2);
+        scene.add(light);
+        //renderer.shadowMapEnabled = true;
+        light.castShadow = true;
+        light.shadowDarkness = 1;
+        renderer.shadowMapSoft = true;
+        plane.receiveShadow = true;
+        //
+
+        document.addEventListener('mousedown', onDocumentMouseDown, false);
+        document.addEventListener('mousemove', onDocumentMouseMove, false);
+        document.addEventListener('mouseup', onDocumentMouseUp, false);
+        document.addEventListener('mousewheel', onDocumentMouseWheel, false);
+        document.addEventListener('DOMMouseScroll', onDocumentMouseWheel, false);
+        window.addEventListener('resize', onWindowResize, false);
+
+
+    }
+
+
+</script>

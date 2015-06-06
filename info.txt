@@ -1,0 +1,43 @@
+
+Studenti
+Andrea Marzoli <andrea.m993@gmail.com>,
+Federico Schipani <iskorini@gmail.com>,
+Filippo Mameli <mameli93@gmail.com>,
+
+Sinossi: Redesign e reimplementazione di un ambiente interattivo web che consente di navigare e muoversi in 3D utilizzando foto sferiche di vari punti sulla mappa di Firenze. Il sistema dovrà inoltre consentire la fruizione di materiale multimediale relativo ad alcuni punti di tali foto sferiche (testi / immagini / modelli 3D) in modo interattivo come da progetto grafico vedi grafica folder.
+
+Altre features da implementare:
+
+
+1) mappa di navigazione con hotspots geolocalizzati e localizzazione utente orientata
+2) dragging e collocazione delle visualizzazioni hotspots nel 3D
+3) sistema di ricerca sui metadati del materiale multimediale come metodo di navigazione
+4) sistema di backend per l’inserimento della posizione di nuovi hotspot e materiali multimediali collegati
+
+Trovate due pacchetti:
+1)backup_30122014_updated - vecchio dovrebbe andare
+2)nuova_versione con cose in più e non ben funzionante
+
+Guardate bene il PDF: demo_exploring3D_icme2015 e la cartella grafica per vedere come dovrebbe essere l’interfaccia 
+
+Riferimenti: 
+
+1) http://threejs.org/ 
+
+
+
+Accessi 
+host: trinity.micc.unifi.it
+home: trinity.micc.unifi.it/tesifer
+protocol: sftp
+usr: tesifer
+pwd: t3s1f3r
+
+Database
+
+host: trinity.micc.unifi.it/phpmyadmin
+usr: tesifer
+pwd: t3s1f3r
+db: tesifer
+
+

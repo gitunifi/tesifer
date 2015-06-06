@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>three.js webgl - Spherical Panorama</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <link href="css/index.css" rel="stylesheet" type="text/css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+
+
+<div id="container">
+</div>
+<div id="mapdiv"></div>
+<div id="info">MICC - Media Integration and Communication Center
+    <script type="text/javascript" src="jslibraries/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <script src="jslibraries/Three58.js"></script>
+    <script src="js/ajax.js"></script>
+    <script src="jslibraries/helvetiker_regular.typeface.js"></script>
+    <script src="jslibraries/CSS3DRenderer.js"></script>
+    <script src="js/main.js"></script>
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script src="js/hotspot.js"></script>
+
+    <div id="project-label">
+        <img src="images/loading1.gif" id="imgLoader"/>
+        <script>
+            document.getElementById('imgLoader').style.display = "none";
+        </script>
+        <script>
+            $(function () {
+
+                $("#project").autocomplete({
+                    source: "php/DBHotspotsName.php",
+                    autoFocus: true,
+                    select: function (event, ui) {
+                        load(ui.item.idPan, ui.item.idx, ui.item.idy, 0, 100);
+                        return false;
+                    }
+                }).autocomplete("instance")._renderItem = function (ul, item) {
+                    if (item.value != null) {
+                        return $("<li>").append("<a>" + item.value + "</a>").appendTo(ul);
+                    }
+                };
+            });
+
+        </script>
+        <style> .olAlphaImg:hover {
+            cursor: pointer;
+        }</style>
+<span>
+<input id="project" placeholder="Search..." onclick="this.focus();this.select()">
+<i class="fa fa-lentina"></i>
+</span>
+    </div>
+    <div id="NavButtons">
+        <button class="myButton" id="goUp" onclick="goUp()"><span class="fa bottoneSu"></span></button>
+        <button class="myButton" id="goToLeft" onclick="goToLeft()"><span class="fa bottoneSinistra"></span></button>
+        <button class="myButton" id="goToRight" onclick="goToRight()"><span class="fa bottoneDestra"></span></button>
+        <button class="myButton" id="goDown" onclick="goDown()"><span class="fa bottoneGiu"></span></button>
+    </div>
+
+    <script>
+        var camera, scene, renderer, mesh, cssScene, rendererCSS, planeMesh, element, cssObject;
+        var objects = [];
+        var cssObjects = [];
+        var objectsPosition = [];
+        var textures = [];
+        var ZoomArray = []; //Zoom Next
+        var interactiveTexts = []; //Interactive click on Text
+        var markers = []; //Hotspot
+        var menuPoints = []; //Interactive menu
+
+        var fov = 70,
+            onMouseDownMouseX = 0, onMouseDownMouseY = 0,
+            lon = 0, onMouseDownLon = 0,
+            lat = 0, onMouseDownLat = 0,
+            phi = 0, theta = 0,
+            latLimit = -30,
+            projector, panoId = 11,
+            minZoom = 70, maxZoom = 20,
+            interactiveObject,
+            selectedFrame,
+            onMouseDownObjectXRotation,
+            onMouseDownObjectYRotation,
+            onMouseDownObjectZRotation,
+            canvas, message, context, intersectedObject, oldIntersectedMarker, mouse = {
+                x: 0,
+                y: 0
+            }, textTexture, sprite, time, // Text Over
+            amILoading = false;
+        /*var fadeEffect = function () {
+            return {
+                init: function (id, flag, target) {
+                    this.elem = document.getElementById(id);
+                    clearInterval(this.elem.si);
+                    this.target = target ? target : flag ? 100 : 0;
+                    this.flag = flag || -1;
+                    this.alpha = this.elem.style.opacity ? parseFloat(this.elem.style.opacity) * 100 : 0;
+                    this.elem.si = setInterval(function () {
+                        fadeEffect.tween();
+                    }, 20);
+                },
+                tween: function () {
+                    if (this.alpha === this.target) {
+                        clearInterval(this.elem.si);
+                    } else {
+                        var value = Math.round(this.alpha + ((this.target - this.alpha) * .05)) + (1 * this.flag);
+                        this.elem.style.opacity = value / 100;
+                        this.elem.style.filter = 'alpha(opacity=' + value + ')';
+                        this.alpha = value;
+                    }
+                }
+            };
+        }();*/
+
+        init();
+        //var light = new THREE.AmbientLight( 0x111 ); // soft white light
+        //scene.add( light );
+        setTimeout(function () {
+            animate();
+        }, 1000);
+
+        function init() {
+            //fadeEffect.init('container', 1);
+            var container = document.getElementById('container');
+            camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1100);
+            camera.target = new THREE.Vector3(0, 0, 0);
+            scene = new THREE.Scene();
+            projector = new THREE.Projector();
+            var panoName = getContent("panorama", panoId).pop()['Panorama'];
+            getHotspot();
+            var texture = THREE.ImageUtils.loadTexture('textures/' + panoName);
+            var geometry = new THREE.SphereGeometry(500, 60, 40);
+            mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({map: texture}));
+            mesh.scale.x = -1;
+            scene.add(mesh);
+            var pointLight = new THREE.PointLight(0xFFFFFF);
+            scene.add(pointLight);
+            ZoomArray = getContent("nextZoom", panoId);
+            //NO USED
+            canvas = document.createElement('canvas');
+            context = canvas.getContext('2d');
+            context.font = "Bold 20px Arial";
+            textTexture = new THREE.Texture(canvas);
+            textTexture.needsUpdate = true;
+            var spriteMaterial = new THREE.SpriteMaterial({
+                map: textTexture,
+                useScreenCoordinates: true,
+                alignment: THREE.SpriteAlignment.topLeft
+            });
+            sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(200, 100, 1.0);
+            scene.add(sprite);
+            //END NO USED
+            renderer = new THREE.WebGLRenderer({antialias: true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.domElement.style.position = 'absolute';
+            renderer.domElement.style.top = 0;
+            renderer.domElement.style.zIndex = 1;
+            container.appendChild(renderer.domElement);
+            document.addEventListener('contextmenu', onDocumentRightClick, false);
+            document.addEventListener('mousedown', onDocumentMouseDown, false);
+            document.addEventListener('mousemove', onDocumentMouseMove, false);
+            document.addEventListener('mouseup', onDocumentMouseUp, false);
+            document.addEventListener('mousewheel', onDocumentMouseWheel, false);
+            document.addEventListener('DOMMouseScroll', onDocumentMouseWheel, false);
+            document.addEventListener('dblclick', onDocumentDoubleclick, false);
+            window.addEventListener('resize', onWindowResize, false);
+            setTimeout(function () {
+                preload(panoId);
+            }, 2000);
+            cssScene = new THREE.Scene();
+            element = document.createElement('iframe');
+            element.frameBorder = "0";
+            rendererCSS = new THREE.CSS3DRenderer();
+            rendererCSS.setSize(window.innerWidth, window.innerHeight);
+            rendererCSS.domElement.style.position = 'absolute';
+            rendererCSS.domElement.style.top = 100;
+            rendererCSS.domElement.style.margin = 0;
+            rendererCSS.domElement.style.padding = 0;
+            container.appendChild(rendererCSS.domElement);
+            renderer.domElement.style.position = 'absolute';
+            renderer.domElement.style.top = 0;
+            renderer.domElement.style.zIndex = 1;
+            rendererCSS.domElement.appendChild(renderer.domElement);
+            makeMap();
+        }
+
+        function getNewPanorama() {
+            var panoArray = getContent("nextPanoramas", panoId);
+            var found = false;
+            while (panoArray.length > 0 && !found) {
+                var candidate = panoArray.pop();
+                found = (Math.abs(lat - candidate['Latitude']) < 20 && Math.abs(lon - candidate['Longitude']) < 20);
+            }
+            if (found) {
+                load(candidate['ID'], candidate['LatitudeOnLoad'], candidate['LongitudeOnLoad'],
+                    candidate['Latitude'], candidate['Longitude']);
+            }
+            return found;
+        }
+
+        function load(id, newLatitude, newLongitude, latitude, longitude) { //FIXME
+
+            if (!amILoading) {
+                amILoading = true;
+                cleanUpHotSpotContent();
+                document.getElementById("mapdiv").innerHTML = "";
+                panoId = id;
+                var panorama = getContent("panorama", panoId).pop()['Panorama'];
+                ZoomArray = getContent("nextZoom", panoId);
+                smoothLonLatTransition(longitude, latitude, 0.5);
+                //fadeEffect.init('container', 0, 40);
+                setTimeout(function () {
+                    var texture = THREE.ImageUtils.loadTexture('textures/' + panorama, '', function onLoad() {
+                        mesh.material.map = texture;
+                        resetZoom();
+                        lat = parseFloat(newLatitude);
+                        lon = parseFloat(newLongitude);
+                        //fadeEffect.init('container', 1);
+                        setTimeout(function () {
+                            amILoading = false;
+                        }, 1000);
+                    });
+                    getHotspot();
+                    preload(panoId);
+                    makeMap();
+                }, 1200);
+            }
+
+            document.getElementById('imgLoader').style.display = "block";
+            setTimeout(function() {
+                document.getElementById('imgLoader').style.display = "none";
+            }, 1200);
+        }
+
+        function preload(panoId) {
+            var panoArray = getContent("nextPanoramas", panoId);
+            for (var i = 0; i < panoArray.length; i++) {
+                var panorama = panoArray[i];
+                var image = new Image();
+                image.src = "textures/" + panorama['Panorama'];
+            }
+        }
+
+        function smoothLonLatTransition(targetLon, targetLat, step) {
+            var stepsNeeded;
+            var lonDistance = Math.abs(lon - targetLon);
+            var latDistance = Math.abs(lat - targetLat);
+
+            if (lonDistance > latDistance) {
+                stepsNeeded = Math.floor(lonDistance / step);
+            }
+            else {
+                stepsNeeded = Math.floor(latDistance / step);
+            }
+
+            var lonStep = lonDistance / stepsNeeded;
+            var latStep = latDistance / stepsNeeded;
+
+            if (targetLon < lon) {
+                lonStep = 0 - lonStep;
+            }
+
+            if (targetLat < lat) {
+                latStep = 0 - latStep;
+            }
+
+            var stepsDone = 0;
+            var actualTransition = function () {
+                if (stepsDone < stepsNeeded) {
+                    stepsDone++;
+                    lon += lonStep;
+                    lat += latStep;
+                    requestAnimationFrame(actualTransition);
+                }
+            };
+
+            actualTransition();
+        }
+
+        function goToRight() {
+            smoothLonLatTransition(lon + 60, lat, 0.5);
+        }
+
+        function goToLeft() {
+            smoothLonLatTransition(lon - 60, lat, 0.5);
+        }
+
+        function goUp() {
+            smoothLonLatTransition(lon, lat + 15, 0.5);
+        }
+
+        function goDown() {
+            var newLat = lat - 15;
+            if (newLat >= latLimit) {
+                smoothLonLatTransition(lon, newLat, 0.5);
+            }
+        }
+
+
+
+        function makeMap() {
+            var map = new OpenLayers.Map('mapdiv');
+            map.addLayer(new OpenLayers.Layer.OSM());
+            var markers = new OpenLayers.Layer.Markers("Markers");
+
+            var panoInfo = getContent("panorama", panoId).pop();
+            var latitude = panoInfo['EarthLatitude'];
+            var longitude = panoInfo['EarthLongitude'];
+            var longitudeLatitude = new OpenLayers.LonLat(longitude, latitude)
+                .transform(
+                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                map.getProjectionObject() // to Spherical Mercator Projection
+            );
+
+            var zoom = 17;
+
+            markers.addMarker(new OpenLayers.Marker(longitudeLatitude));
+
+
+            map.setCenter(longitudeLatitude, zoom);
+            map.addLayer(markers);
+            var size = new OpenLayers.Size(15, 15);
+            var offset = new OpenLayers.Pixel(-(size.w / 2), -size.h);
+            var icon = new OpenLayers.Icon('images/informazioni.png', size, offset);
+
+            var hotspotArray = getContent("hotspotPlaced");
+            var lonLat;
+
+
+            var lgpx = new OpenLayers.Layer.Vector("Via San Leonardo", {
+                strategies: [new OpenLayers.Strategy.Fixed()],
+                protocol: new OpenLayers.Protocol.HTTP({
+                    url: "map/itinerario.gpx",
+                    format: new OpenLayers.Format.GPX()
+                }),
+                style: {strokeColor: "green", strokeWidth: 5, strokeOpacity: 0.5},
+                projection: new OpenLayers.Projection("EPSG:4326")
+            });
+
+            map.addLayer(lgpx);
+
+            var mark1 = new OpenLayers.Layer.Markers("Mark1");
+            var mark2 = new OpenLayers.Layer.Markers("Mark2");
+            var mark3 = new OpenLayers.Layer.Markers("Mark3");
+
+            //while (hotspotArray.length > 0) {
+            var hotspot = hotspotArray.pop();
+            lonLat = new OpenLayers.LonLat(hotspot['EarthLongitude'], hotspot['EarthLatitude'])
+                .transform(
+                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                map.getProjectionObject() // to Spherical Mercator Projection
+            );
+            mark1.addMarker(new OpenLayers.Marker(lonLat, icon.clone()));
+
+            map.addLayer(mark1);
+            //}
+
+            hotspot = hotspotArray.pop();
+            lonLat = new OpenLayers.LonLat(hotspot['EarthLongitude'], hotspot['EarthLatitude'])
+                .transform(
+                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                map.getProjectionObject() // to Spherical Mercator Projection
+            );
+            mark2.addMarker(new OpenLayers.Marker(lonLat, icon.clone()));
+
+            map.addLayer(mark2);
+
+            hotspot = hotspotArray.pop();
+            lonLat = new OpenLayers.LonLat(hotspot['EarthLongitude'], hotspot['EarthLatitude'])
+                .transform(
+                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                map.getProjectionObject() // to Spherical Mercator Projection
+            );
+            mark3.addMarker(new OpenLayers.Marker(lonLat, icon.clone()));
+
+            map.addLayer(mark3);
+            mark1.events.register("click", mark1, function () {
+                load(12, 3, 0, 0, 100);
+            });
+
+            mark2.events.register("click", mark2, function () {
+                load(11, -3, 0, 0, 100);
+            });
+
+            mark3.events.register("click", mark2, function () {
+                load(8, -3, 0, 0, 100);
+            });
+
+
+        }
+
+
+    </script>
+</div>
+</body>
+</html>
