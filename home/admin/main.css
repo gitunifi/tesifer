@@ -1,3 +1,55 @@
 .dataTables_scrollBody thead th:after {
     content: none !important;
 }
+
+.media {
+    position: relative;
+    border: 4px solid #fff;
+    margin: 10px 0px;
+}
+
+.media.checked {
+    border: 4px solid #2e6da4;
+}
+
+.media.checked::before {
+    position: absolute;
+    content: "\f00c";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    width: 30px;
+    height: 30px;
+    border-radius: 35px;
+    font-size: 24px;
+    line-height: 1.33;
+    padding: 0px 3px;
+    right: 5px;
+    top: 5px;
+}
+
+.media.remove::before {
+    position: absolute;
+    content: "\f00d";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    width: 30px;
+    height: 30px;
+    border-radius: 35px;
+    font-size: 24px;
+    line-height: 1.25;
+    padding: 0px 6px;
+    right: 5px;
+    top: 5px;
+}

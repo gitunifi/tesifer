@@ -1,8 +1,16 @@
 <?php
 
 $page = "home";
-if (isset($_GET['page']))
+if (isset($_GET['page'])) {
     $page = $_GET['page'];
+}
+
+$params = array();
+foreach($_GET as $key => $param) {
+    if ($key != "page") {
+        $params[$key] = $param;
+    }
+}
 ?>
 <html>
 <head>
@@ -33,6 +41,7 @@ if (isset($_GET['page']))
                         <a href="?page=galleria"><i class="fa fa-picture-o fa-fw"></i> Galleria</a>
                         <a href="?page=oggetti"><i class="fa fa-cube fa-fw"></i> Oggetti</a>
                         <a href="?page=documenti"><i class="fa fa-file-pdf-o fa-fw"></i> Documenti</a>
+                        <a href="?page=panorama"><i class="fa fa-globe fa-fw"></i> Panorama</a>
                     </li>
                 </ul>
             </div>
@@ -42,9 +51,9 @@ if (isset($_GET['page']))
 
         <?php
 
-        if (file_exists("pages/" . $page . ".html"))
+        if (file_exists("pages/" . $page . ".php"))
         {
-            include "pages/" . $page . ".html";
+            include "pages/" . $page . ".php";
         }
 
         if (file_exists("pages/" . $page . ".js"))
