@@ -103,3 +103,67 @@ class Gallery
     }
 }
 
+class Documents
+{
+    public function getDocuments()
+    {
+        return Db::fetchAll("
+            SELECT id, source
+            FROM PDF
+            ORDER BY id desc
+        ");
+    }
+
+    public function addDocument()
+    {
+        $uploaddir = '../../pdf/web/';
+        $file = basename($_FILES['userfile']['name']);
+        $nfile = $file;
+        $i = 1;
+        $uploadfile = $uploaddir . $nfile;
+        while (file_exists($uploadfile) && $i < 10000) {
+            $nfile = str_replace(".", $i . ".", $file);
+            $uploadfile = $uploaddir . $nfile;
+            $i++;
+        }
+        if(!file_exists($uploadfile)) {
+            if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+                Db::insert(sprintf("
+                    INSERT INTO PDF(source) VALUES ('%s');
+                ", $nfile));
+            }
+        }
+        header("location: ../?page=documenti");
+        exit;
+    }
+
+    public function removeDocument($id)
+    {
+        $result = [
+            "success" => false
+        ];
+
+        if ($id > 0) {
+            $source = Db::fetchAll(sprintf("
+                SELECT source
+                FROM pdf
+                where id = '%d'
+            ", $id));
+
+            Db::delete(sprintf("
+                DELETE FROM PDF WHERE id = '%d';
+            ", $id));
+
+            if (isset($source[0])) {
+                unlink("../../pdf/web/" . $source[0]['source']);
+            }
+
+            $result = [
+                "success" => true
+            ];
+        }
+
+        return $result;
+    }
+}
+

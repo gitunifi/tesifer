@@ -8,7 +8,7 @@
     <!-- /.row -->
     <div class="row">
         <div class="col-lg-4 col-md-6">
-            <div class="panel panel-green">
+            <div class="panel panel-lightblue">
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
