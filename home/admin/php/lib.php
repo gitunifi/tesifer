@@ -167,3 +167,44 @@ class Documents
     }
 }
 
+class Panorama
+{
+    public function getPanoramas()
+    {
+        return Db::fetchAll("
+            SELECT id, panorama, earthlatitude lat, earthlongitude as lng
+            FROM Panorama
+            WHERE earthlatitude is not null AND earthlongitude is not null
+            ORDER BY id
+
+        ");
+    }
+
+    public function removePanorama($id)
+    {
+        $result = [
+            "success" => false
+        ];
+
+        if ($id > 0) {
+            /*Db::delete(sprintf("
+                DELETE FROM Panorama WHERE id = '%d';
+            ", $id));
+
+            Db::delete(sprintf("
+                DELETE FROM HotspotNelPanorama WHERE idpanorama = '%d';
+            ", $id));
+
+            Db::delete(sprintf("
+                DELETE FROM Collegamento WHERE idcalling = '%d' OR idcalled = '%d';
+            ", $id, $id));*/
+
+            $result = [
+                "success" => true
+            ];
+        }
+
+        return $result;
+    }
+}
+

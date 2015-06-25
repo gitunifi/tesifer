@@ -24,6 +24,9 @@ foreach($_GET as $key => $param) {
     <link href="components/morrisjs/morris.css" rel="stylesheet">
     <link href="components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <script src="components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ZOOm3ssYsWpjsDlm9V78vWXD9pVd2ro">
+    </script>
 </head>
 <body>
 <div id="wrapper">
