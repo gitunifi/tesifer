@@ -208,3 +208,175 @@ class Panorama
     }
 }
 
+
+class Objects
+{
+    public function getObjects()
+    {
+        return Db::fetchAll("
+            SELECT id, object, mtl
+            FROM Oggetto
+            ORDER BY id desc
+        ");
+    }
+
+    public function addObject()
+    {
+        $uploaddir = '../../objects/';
+        $file = basename($_FILES['userfileobj']['name']);
+        $nfile = $file;
+        $i = 1;
+        $uploadfile = $uploaddir . $nfile;
+        while (file_exists($uploadfile) && $i < 10000) {
+            $nfile = str_replace(".", $i . ".", $file);
+            $uploadfile = $uploaddir . $nfile;
+            $i++;
+        }
+
+        $file2 = basename($_FILES['userfilemtl']['name']);
+        $nfile2 = $file2;
+        $i = 1;
+        $uploadfile2 = $uploaddir . $nfile2;
+        while (file_exists($uploadfile2) && $i < 10000) {
+            $nfile2 = str_replace(".", $i . ".", $file2);
+            $uploadfile2 = $uploaddir . $nfile2;
+            $i++;
+        }
+        if(!file_exists($uploadfile) && !file_exists($uploadfile2)) {
+            if (move_uploaded_file($_FILES['userfileobj']['tmp_name'], $uploadfile) && move_uploaded_file($_FILES['userfilemtl']['tmp_name'], $uploadfile2)) {
+                Db::insert(sprintf("
+                    INSERT INTO Oggetto(object, mtl) VALUES ('%s', '%s');
+                ", $nfile, $nfile2));
+            }
+        }
+        header("location: ../?page=oggetti");
+        exit;
+    }
+
+    public function removeObject($id)
+    {
+        $result = [
+            "success" => false
+        ];
+
+        if ($id > 0) {
+            $source = Db::fetchAll(sprintf("
+                SELECT object, mtl
+                FROM oggetto
+                where id = '%d'
+            ", $id));
+
+            Db::delete(sprintf("
+                DELETE FROM oggetto WHERE id = '%d';
+            ", $id));
+
+            if (isset($source[0])) {
+                unlink("../../objects/" . $source[0]['object']);
+                unlink("../../objects/" . $source[0]['mtl']);
+            }
+
+            $result = [
+                "success" => true
+            ];
+        }
+
+        return $result;
+    }
+}
+
+class Hotspots
+{
+    public function getHotspots()
+    {
+        return Db::fetchAll("
+            SELECT id, subject
+            FROM Hotspot
+            ORDER BY id desc
+        ");
+    }
+
+    public function addHotspot()
+    {
+        $result = [
+            "success" => false
+        ];
+        $title = "";
+        $galleryid = "";
+        $objectid = "";
+        $documentid = "";
+        if (isset($_POST["title"])) $title = $_POST["title"];
+        if (isset($_POST["gallery"])) $galleryid = $_POST["gallery"];
+        if (isset($_POST["object"])) $objectid = $_POST["object"];
+        if (isset($_POST["document"])) $documentid = $_POST["document"];
+
+        if ($title != "") {
+            Db::insert(sprintf("
+                    INSERT INTO hotspot(markersource, subject) VALUES ('marker.obj', '%s');
+                ", $title));
+
+            $query = Db::fetchAll("
+                SELECT id
+                FROM Hotspot
+                ORDER BY id desc
+                LIMIT 1
+            ");
+
+            $id = 0;
+            if (isset($query[0])) $id = $query[0]["id"];
+
+            if ($id > 0) {
+                if ($galleryid != "" && intval($galleryid) != 0) {
+                    Db::insert(sprintf("
+                        INSERT INTO hotspotinfo(hotspotid, name, idname, source, height, width) VALUES ('%d', 'Gallery', '%d', 'gallery.html', 300, 400);
+                    ", $id, $galleryid));
+                }
+
+                if ($objectid != "" && intval($objectid) != 0) {
+                    Db::insert(sprintf("
+                        INSERT INTO hotspotinfo(hotspotid, name, idname, source, height, width) VALUES ('%d', 'Object', '%d', 'Object.html', 400, 400);
+                    ", $id, $objectid));
+                }
+
+                if ($documentid != "" && intval($documentid) != 0) {
+                    Db::insert(sprintf("
+                        INSERT INTO hotspotinfo(hotspotid, name, idname, source, height, width) VALUES ('%d', 'PDF', '%d', 'pdf/web/viewer.html', 600, 600);
+                    ", $id, $documentid));
+                }
+            }
+
+            $result["success"] = true;
+        }
+
+        return $result;
+    }
+
+    public function removeHotspot($id)
+    {
+        $result = [
+            "success" => false
+        ];
+
+        if ($id > 0) {
+
+            Db::delete(sprintf("
+                DELETE FROM HotspotNelPanorama WHERE idhotspot = '%d';
+            ", $id));
+
+            Db::delete(sprintf("
+                DELETE FROM HotspotInfo WHERE hotspotid = '%d';
+            ", $id));
+
+
+            Db::delete(sprintf("
+                DELETE FROM Hotspot WHERE id = '%d';
+            ", $id));
+
+            $result = [
+                "success" => true
+            ];
+        }
+
+        return $result;
+    }
+}
+

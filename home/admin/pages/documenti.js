@@ -8,6 +8,7 @@ $(function() {
             $("#document-container").append(' \
                 <div class="col-lg-4 col-md-6"> \
                     <div class="panel panel-red" data-id="' + value["id"] + '"> \
+                        <div class="remove-btn hide"><i class="fa fa-times"></i></div> \
                         <div class="panel-heading"> \
                             <div class="row"> \
                                 <div class="col-xs-3"> \
@@ -38,15 +39,15 @@ $(function() {
             $(this).attr("mode", 0);
             $(this).html('<i class="fa fa-edit"></i> Modifica');
         }
-        $("#document-container .panel").toggleClass("remove");
-        $("#document-container .panel.remove").click(function() {
+        $("#document-container .panel .remove-btn").toggleClass("hide");
+        $("#document-container .panel .remove-btn").click(function() {
             $.ajax({
-                url: "php/?controller=Documents;removeDocument;" + $(this).attr("data-id"),
+                url: "php/?controller=Documents;removeDocument;" + $(this).parent().attr("data-id"),
                 dataType: "json",
                 context: this
             }).done(function(response) {
                 if(response && response.success == true) {
-                    $(this).parent().remove();
+                    $(this).parent().parent().remove();
                 } else {
                     alert("Si è verificato un errore");
                 }

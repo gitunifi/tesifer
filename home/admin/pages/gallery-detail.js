@@ -10,6 +10,7 @@ $(function() {
             $("#gallery-container").append(' \
                 <div class="col-lg-3 col-md-3"> \
                     <div class="media" data-id="' + value["id"] + '"> \
+                        <div class="remove-btn hide"><i class="fa fa-times"></i></div> \
                         <img src="../objects/' + value["thumbnail"] + '" data-img="../objects/' + value["source"] + '" style="cursor: pointer; width: 100%;" /> \
                     </div> \
                 </div>');
@@ -26,15 +27,15 @@ $(function() {
                 $(this).attr("mode", 0);
                 $(this).html('<i class="fa fa-edit"></i> Modifica');
             }
-            $("#gallery-container .media").toggleClass("remove");
-            $("#gallery-container .media.remove").click(function() {
+            $("#gallery-container .media .remove-btn").toggleClass("hide");
+            $("#gallery-container .media .remove-btn").click(function() {
                 $.ajax({
-                    url: "php/?controller=Gallery;removeMedia;" + $("#gallery-container").attr("data-id") + "," + $(this).attr("data-id"),
+                    url: "php/?controller=Gallery;removeMedia;" + $("#gallery-container").attr("data-id") + "," + $(this).parent().attr("data-id"),
                     dataType: "json",
                     context: this
                 }).done(function(response) {
                     if(response && response.success == true) {
-                        $(this).parent().remove();
+                        $(this).parent().parent().remove();
                     } else {
                         alert("Si è verificato un errore");
                     }
