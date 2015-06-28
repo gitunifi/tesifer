@@ -30,6 +30,13 @@ class Db {
         return $insert;
     }
 
+    public static function update($query) {
+        self::connect();
+        $insert = mysqli_query(self::$con, $query);
+        self::close();
+        return $insert;
+    }
+
     public static function delete($query) {
         self::connect();
         $delete = mysqli_query(self::$con, $query);

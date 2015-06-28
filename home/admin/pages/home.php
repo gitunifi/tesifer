@@ -74,6 +74,28 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6">
+            <div class="panel panel-brown">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-globe fa-3x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <h4>Interni</h4>
+                        </div>
+                    </div>
+                </div>
+                <a href="?page=internal">
+                    <div class="panel-footer">
+                        <span class="pull-left">Visualizza</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
             <div class="panel panel-yellow">
                 <div class="panel-heading">
                     <div class="row">

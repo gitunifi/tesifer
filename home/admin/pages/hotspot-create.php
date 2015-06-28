@@ -30,7 +30,7 @@
         </div>
     </div>
     <div class="col-xs-6 col-md-3">
-        <div id="panorama-add" class="thumbnail" align="center" style="background-color: #f5f5f5; cursor: pointer;">
+        <div id="internal-add" class="thumbnail" align="center" style="background-color: #f5f5f5; cursor: pointer;">
             <div class="remove-btn hide"><i class="fa fa-times"></i></div>
             <h3 style="margin: 0px;"><i class="fa fa-plus"></i> Interno</h3>
         </div>
@@ -73,6 +73,20 @@
             </div>
             <div class="modal-body" >
                 <div id="document-modal-container" class="row">
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div id="internal-modal" class="modal fade">
+    <div class="modal-dialog" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Seleziona il panorama interno da includere</h4>
+            </div>
+            <div class="modal-body" >
+                <div id="internal-modal-container" class="row">
                 </div>
             </div>
         </div><!-- /.modal-content -->

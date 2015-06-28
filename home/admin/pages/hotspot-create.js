@@ -8,8 +8,8 @@ $(function() {
     $("#document-add").click(function() {
         $("#document-modal").modal();
     });
-    $("#panorama-add").click(function() {
-        $("#panorama-modal").modal();
+    $("#internal-add").click(function() {
+        $("#internal-modal").modal();
     });
 
     $.ajax({
@@ -147,18 +147,63 @@ $(function() {
         });
     });
 
+    $.ajax({
+        url: "php/?controller=Internal;getInternals",
+        dataType: "json",
+        context: this
+    }).done(function(response) {
+        $.each(response, function(key, value) {
+            $("#internal-modal-container").append(' \
+                <div class="col-lg-4 col-md-6"> \
+                    <div class="panel panel-brown"> \
+                        <div class="panel-heading"> \
+                            <div class="row"> \
+                                <div class="col-xs-3"> \
+                                    <i class="fa fa-globe fa-3x"></i> \
+                                </div> \
+                                <div class="col-xs-9 text-right"> \
+                                    <h4>' + value["panorama"] + '</h4> \
+                                </div> \
+                            </div> \
+                        </div> \
+                        <a data-id="' + value["id"] + '" data-title="' + value["panorama"] +'"> \
+                            <div class="panel-footer"> \
+                                <span class="pull-left">Seleziona</span> \
+                                <span class="pull-right"><i class="fa fa-check"></i></span> \
+                                <div class="clearfix"></div> \
+                            </div> \
+                        </a> \
+                    </div> \
+                </div>');
+        });
+        $("#internal-modal-container a").click(function(e) {
+            e.preventDefault();
+            $("#internal-add").attr("data-id", $(this).attr("data-id")).find("h3").html($(this).attr("data-title"));
+            $("#internal-add .remove-btn").removeClass("hide");
+            $("#internal-add .remove-btn").off('click').click(function(e) {
+                e.stopPropagation();
+                $(this).addClass("hide");
+                $(this).parent().attr("data-id", "");
+                $(this).parent().find("h3").html('<i class="fa fa-plus"></i> Interno');
+            });
+            $("#internal-modal").modal('hide');
+            return false;
+        });
+    });
+
     $("#create-hotspot").click(function() {
         if($("#hotspot-name").val().trim() != "") {
             var title = $("#hotspot-name").val().trim();
             var galleryid = $("#gallery-add").attr("data-id");
             var objectid = $("#object-add").attr("data-id");
             var documentid = $("#document-add").attr("data-id");
+            var internalid = $("#internal-add").attr("data-id");
             $.ajax({
                 url: "php/?controller=Hotspots;addHotspot",
                 dataType: "json",
                 context: this,
                 type: "POST",
-                data: "title=" + title + "&gallery=" + galleryid + "&object=" + objectid + "&document=" + documentid
+                data: "title=" + title + "&gallery=" + galleryid + "&object=" + objectid + "&document=" + documentid + "&internal=" + internalid
             }).done(function(response) {
                 if(response && response.success == true) {
                     location.href = "?page=hotspot";

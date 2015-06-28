@@ -12,7 +12,7 @@ $(function() {
             else if (value["numero"] > 1) text = value["numero"] + " immagini";
             $("#gallery-container").append(' \
                 <div class="col-lg-4 col-md-6"> \
-                    <div class="panel panel-green"> \
+                    <div class="panel panel-yellow"> \
                         <div class="panel-heading"> \
                             <div class="row"> \
                                 <div class="col-xs-3"> \

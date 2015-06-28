@@ -1,4 +1,10 @@
-<div id="map-canvas" style="height: 100%;"></div>
+<div id="hotspot-container" class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Panorama <a href="?page=panorama-create" class="btn btn-success" style="float:right;"><i class="fa fa-plus"></i> Aggiungi nuovo</a> <button type="button" id="panorama-edit" state="0" class="btn btn-success" style="float:right; margin-right: 5px;"><i class="fa fa-edit"></i> Modifica</button></h1>
+    </div>
+</div>
+<div id="modificaEnabled" class="hide" style="background-color: rgb(29, 94, 168); color: white; padding: 5px 10px; font-size: 14px;">Puoi ora spostare i panorami</div>
+<div id="map-canvas" style="height: 600px;"></div>
 <div id="panorama-modal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">

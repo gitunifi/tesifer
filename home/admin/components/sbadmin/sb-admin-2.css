@@ -388,3 +388,22 @@ table.dataTable thead .sorting:after {
 .panel-lightblue a:hover {
     color: #0890b3;
 }
+
+
+.panel-brown {
+    border-color: #804F4F;
+}
+
+.panel-brown .panel-heading {
+    border-color: #804F4F;
+    color: #fff;
+    background-color: #804F4F;
+}
+
+.panel-brown a {
+    color: #804F4F;
+}
+
+.panel-brown a:hover {
+    color: #501c1c;
+}

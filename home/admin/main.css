@@ -81,6 +81,11 @@ a, button {
     cursor: pointer;
 }
 
+hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 .thumbnail .remove-btn {
     position: absolute;
     content: "\f00d";
@@ -117,6 +122,14 @@ input[type='text'] {
 
 .panel a, .panel a span {
     cursor: pointer;
+}
+
+.red {
+    width: 8px; height: 12px; background-color: red; display: inline-block;
+}
+
+.blue {
+    width: 8px; height: 12px; background-color: #0080c0; display: inline-block;
 }
 
 
