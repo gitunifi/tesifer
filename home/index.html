@@ -7,15 +7,39 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
     <link href="css/index.css" rel="stylesheet" type="text/css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ZOOm3ssYsWpjsDlm9V78vWXD9pVd2ro">
+    </script>
+    <script type="text/javascript" src="jslibraries/jquery.min.js"></script>
 </head>
 <body>
 
+<div id="search-wrapper">
+    <input id="search" onclick="this.focus();">
+    <button id="search-button"><i class="fa fa-lentina"></i></button>
+</div>
+<script>
+    $(function () {
 
+        $("#search").autocomplete({
+            source: "php/DBHotspotsName.php",
+            autoFocus: true,
+            select: function (event, ui) {
+                load(ui.item.idPan, ui.item.idx, ui.item.idy, 0, 100);
+                return false;
+            }
+        }).autocomplete("instance")._renderItem = function (ul, item) {
+            if (item.value != null) {
+                return $("<li>").append("<a>" + item.value + "</a>").appendTo(ul);
+            }
+        };
+    });
+
+</script>
 <div id="container">
 </div>
 <div id="mapdiv"></div>
 <div id="info">MICC - Media Integration and Communication Center
-    <script type="text/javascript" src="jslibraries/jquery.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
     <script src="jslibraries/Three58.js"></script>
     <script src="js/ajax.js"></script>
@@ -24,37 +48,11 @@
     <script src="js/main.js"></script>
     <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script src="js/hotspot.js"></script>
-
     <div id="project-label">
         <img src="images/loading1.gif" id="imgLoader"/>
         <script>
             document.getElementById('imgLoader').style.display = "none";
         </script>
-        <script>
-            $(function () {
-
-                $("#project").autocomplete({
-                    source: "php/DBHotspotsName.php",
-                    autoFocus: true,
-                    select: function (event, ui) {
-                        load(ui.item.idPan, ui.item.idx, ui.item.idy, 0, 100);
-                        return false;
-                    }
-                }).autocomplete("instance")._renderItem = function (ul, item) {
-                    if (item.value != null) {
-                        return $("<li>").append("<a>" + item.value + "</a>").appendTo(ul);
-                    }
-                };
-            });
-
-        </script>
-        <style> .olAlphaImg:hover {
-            cursor: pointer;
-        }</style>
-<span>
-<input id="project" placeholder="Search..." onclick="this.focus();this.select()">
-<i class="fa fa-lentina"></i>
-</span>
     </div>
     <div id="NavButtons">
         <button class="myButton" id="goUp" onclick="goUp()"><span class="fa bottoneSu"></span></button>
@@ -302,100 +300,57 @@
             }
         }
 
-
+        var map;
 
         function makeMap() {
-            var map = new OpenLayers.Map('mapdiv');
-            map.addLayer(new OpenLayers.Layer.OSM());
-            var markers = new OpenLayers.Layer.Markers("Markers");
-
             var panoInfo = getContent("panorama", panoId).pop();
-            var latitude = panoInfo['EarthLatitude'];
-            var longitude = panoInfo['EarthLongitude'];
-            var longitudeLatitude = new OpenLayers.LonLat(longitude, latitude)
-                .transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-            );
+            var lat = panoInfo['EarthLatitude'];
+            var lng = panoInfo['EarthLongitude'];
 
-            var zoom = 17;
-
-            markers.addMarker(new OpenLayers.Marker(longitudeLatitude));
-
-
-            map.setCenter(longitudeLatitude, zoom);
-            map.addLayer(markers);
-            var size = new OpenLayers.Size(15, 15);
-            var offset = new OpenLayers.Pixel(-(size.w / 2), -size.h);
-            var icon = new OpenLayers.Icon('images/informazioni.png', size, offset);
+            var mapOptions = {
+                center: { lat: parseFloat(lat), lng: parseFloat(lng)},
+                zoom: 17
+            };
+            map = new google.maps.Map(document.getElementById('mapdiv'), mapOptions);
 
             var hotspotArray = getContent("hotspotPlaced");
-            var lonLat;
+            $.each(hotspotArray, function(index, value) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(parseFloat(value['EarthLatitude']), parseFloat(value['EarthLongitude'])),
+                    map: map
+                });
 
-
-            var lgpx = new OpenLayers.Layer.Vector("Via San Leonardo", {
-                strategies: [new OpenLayers.Strategy.Fixed()],
-                protocol: new OpenLayers.Protocol.HTTP({
-                    url: "map/itinerario.gpx",
-                    format: new OpenLayers.Format.GPX()
-                }),
-                style: {strokeColor: "green", strokeWidth: 5, strokeOpacity: 0.5},
-                projection: new OpenLayers.Projection("EPSG:4326")
+                google.maps.event.addListener(marker, 'click', function(e) {
+                    load(12, 3, 0, 0, 100);
+                    load(11, -3, 0, 0, 100);
+                    load(8, -3, 0, 0, 100);
+                });
             });
-
-            map.addLayer(lgpx);
-
-            var mark1 = new OpenLayers.Layer.Markers("Mark1");
-            var mark2 = new OpenLayers.Layer.Markers("Mark2");
-            var mark3 = new OpenLayers.Layer.Markers("Mark3");
-
-            //while (hotspotArray.length > 0) {
-            var hotspot = hotspotArray.pop();
-            lonLat = new OpenLayers.LonLat(hotspot['EarthLongitude'], hotspot['EarthLatitude'])
-                .transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-            );
-            mark1.addMarker(new OpenLayers.Marker(lonLat, icon.clone()));
-
-            map.addLayer(mark1);
-            //}
-
-            hotspot = hotspotArray.pop();
-            lonLat = new OpenLayers.LonLat(hotspot['EarthLongitude'], hotspot['EarthLatitude'])
-                .transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-            );
-            mark2.addMarker(new OpenLayers.Marker(lonLat, icon.clone()));
-
-            map.addLayer(mark2);
-
-            hotspot = hotspotArray.pop();
-            lonLat = new OpenLayers.LonLat(hotspot['EarthLongitude'], hotspot['EarthLatitude'])
-                .transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-            );
-            mark3.addMarker(new OpenLayers.Marker(lonLat, icon.clone()));
-
-            map.addLayer(mark3);
-            mark1.events.register("click", mark1, function () {
-                load(12, 3, 0, 0, 100);
+            $.ajax({
+                type: "GET",
+                url:  "map/itinerario.gpx",
+                dataType: "xml",
+                complete: function(xml) {
+                    var points = [];
+                    var bounds = new google.maps.LatLngBounds();
+                    $(xml.responseXML).find("trkpt").each(function () {
+                        var lat = $(this).attr("lat");
+                        var lon = $(this).attr("lon");
+                        var p = new google.maps.LatLng(lat, lon);
+                        points.push(p);
+                        bounds.extend(p);
+                    });
+                    var poly = new google.maps.Polyline({
+                        // use your own style here
+                        path: points,
+                        strokeColor: "#00DD00",
+                        strokeOpacity: .7,
+                        strokeWeight: 4
+                    });
+                    poly.setMap(map);
+                }
             });
-
-            mark2.events.register("click", mark2, function () {
-                load(11, -3, 0, 0, 100);
-            });
-
-            mark3.events.register("click", mark2, function () {
-                load(8, -3, 0, 0, 100);
-            });
-
-
         }
-
-
     </script>
 </div>
 </body>
