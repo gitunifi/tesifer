@@ -1,6 +1,14 @@
-1) Algoritmo di Matching
-2) Zoom e transizione
-3) Mappa più accurata -- 
-4) Dragging --
-5) Migliorare ricerca --
-6) Backend --
+
+                               -------------
+1) Algoritmo di Matching       |   |   |   |
+                               -------------
+2) Zoom e transizione          |   |   |   |
+                               -------------
+3) Mappa più accurata --       | * |   |   |
+                               -------------
+4) Dragging --                 | * |   |   |
+                               -------------
+5) Migliorare ricerca --       | * |   |   |
+                               -------------
+6) Backend --                  | * | * |   |
+                               -------------

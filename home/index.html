@@ -71,7 +71,7 @@
         var interactiveTexts = []; //Interactive click on Text
         var markers = []; //Hotspot
         var menuPoints = []; //Interactive menu
-
+        var dragHotspotId = null;
         var fov = 70,
             onMouseDownMouseX = 0, onMouseDownMouseY = 0,
             lon = 0, onMouseDownLon = 0,
@@ -132,7 +132,7 @@
             var panoName = getContent("panorama", panoId).pop()['Panorama'];
             getHotspot();
             var texture = THREE.ImageUtils.loadTexture('textures/' + panoName);
-            var geometry = new THREE.SphereGeometry(500, 60, 40);
+            var geometry = new THREE.SphereGeometry(500, 60, 60);
             mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({map: texture}));
             mesh.scale.x = -1;
             scene.add(mesh);

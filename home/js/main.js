@@ -44,6 +44,7 @@ function onDocumentMouseDown(event) {
     if (event.which === 3) {
         isRightClick = true;
     }
+    dragHotspotId = false;
     isUserInteracting = true;
     onPointerDownPointerX = event.clientX;
     onPointerDownPointerY = event.clientY;
@@ -59,10 +60,14 @@ function onDocumentMouseDown(event) {
         var intersects = raycaster.intersectObjects(markers, true);
         if (intersects[0] !== undefined) {
             interactiveObject = intersects[0].object;
-            onMouseDownObjectXRotation = interactiveObject.rotation.x;
-            onMouseDownObjectYRotation = interactiveObject.rotation.y;
-            onMouseDownObjectZRotation = interactiveObject.rotation.z;
-            manageHotspot();
+            //onMouseDownObjectXRotation = interactiveObject.rotation.x;
+            //onMouseDownObjectYRotation = interactiveObject.rotation.y;
+            //onMouseDownObjectZRotation = interactiveObject.rotation.z;
+            if (interactiveObject.name == "Sphere") {
+                dragHotspotId = interactiveObject.hotspotId;
+            } else {
+                manageHotspot();
+            }
         }
     }
 
@@ -98,11 +103,16 @@ function onDocumentMouseMove(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
+
+    if (dragHotspotId) {
+        dragHotspot(dragHotspotId, mouse);
+    }
 }
 
 function onDocumentMouseUp(event) {
     event.preventDefault();
     isRightClick = false;
+    dragHotspotId = null;
     isUserInteracting = false;
     interactiveObject = undefined;
 }
@@ -213,16 +223,12 @@ function onDocumentRightClick(event) {
     }
 }
 
-function printLonLatInfo() {
-    console.log("Longitude: " + lon);
-    console.log("Latitude: " + lat);
-}
-
 function isZoomIn(previousFov, fov) {
     return previousFov > fov ? true : false;
 }
 
 
+//CALCOLA GLI ANGOLI PER RUOTARE LA VISUALE VERSO IL PANNELLO CHE SI APRE CLICCANDO SU UN ELEMENTO DI UN PUNTO DI INTERESSE
 function XYZtoLonLat(x, y, z) {
     var lonLat = [];
     lonLat[1] = Math.acos(y / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2))) - Math.PI / 2;

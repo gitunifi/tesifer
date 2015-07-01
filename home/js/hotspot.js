@@ -87,7 +87,6 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
 
 
         if (leftOrRight === "left") {
-            console.log(angle);
             planeMesh.position.x -= distance * Math.sin(angle);
             planeMesh.position.z += distance * Math.cos(angle);
         }
@@ -232,7 +231,6 @@ function manageHotspot() {
     else {
         angle = Math.atan((interactiveObject.position.z / interactiveObject.position.x) + Math.PI);
     }
-
     switch (interactiveObject.name) {
         case "Gallery":
             if (rightPosition || selectedFrame !== interactiveObject) {
@@ -448,8 +446,8 @@ function makeHotspot(position, id) {
     scene.add(torus4);
 //Crea il centro dell'hotspot, quello con quattro frecce.
     var arrowPts = [];
-//distanza dal centro all'inizio della freccia, viene sommato agli altri per semplicità, tanto c'è sempre (ahah)
-    var m = 0.6;
+
+    var m = 1.4;
 //lunghezza del corpo della freccia
     var l = m + 7;
 //larghezza della freccia
@@ -500,6 +498,43 @@ function makeHotspot(position, id) {
     arrow.lookAt(new THREE.Vector3(0, 0, 0));
     //arrow.rotation.y = angolo;
     //arrow.rotation.y = arrow.rotation.y + Math.PI / 2 + Math.atan(parseFloat(arrow.position.z) / parseFloat(arrow.position.x)); //FIXME
+}
+
+function dragHotspot(hotspotId, position) {
+    var vector = new THREE.Vector3();
+
+    vector.set(
+        position.x,
+        position.y,
+        0.5 );
+
+    projector.unprojectVector(vector, camera);
+
+    var dir = vector.sub( camera.position ).normalize();
+
+    var distance = 210;
+
+    var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+    pos.y = 0;
+
+    cleanUpHotSpotContent(hotspotId);
+    selectedFrame = undefined;
+
+    for (var i = 0; i < markers.length; i++) {
+        if (markers[i].hotspotId === hotspotId) {
+            markers[i].position = pos;
+            markers[i].lookAt(new THREE.Vector3(0, 0, 0));
+            if (markers[i].name == "Object") {
+                markers[i].rotation.z = markers[i].rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
+            } else if (markers[i].name == "PDF") {
+                markers[i].rotation.z = markers[i].rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
+            } else if (markers[i].name == "Gallery") {
+                markers[i].rotation.z = markers[i].rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
+            } else if (markers[i].name == "Panorama") {
+                markers[i].rotation.z = markers[i].rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
+            }
+        }
+    }
 }
 
 
