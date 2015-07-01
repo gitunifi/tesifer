@@ -56,7 +56,7 @@ function initialize() {
                 });
 
                 var infowindow = new google.maps.InfoWindow({
-                    content: "<div style='width: 500px;'><img src='../textures/" + value['panorama'] + "' width='100%' height='auto'></div><a target='_blank' href='../index.html?id=" + value['id'] + "' class='btn btn-primary' style='margin-top: 5px; padding: 3px 9px;'><i class='fa fa-eye'></i> Visualizza</a> <a href='?page=panorama-detail&id=" + value['id'] + "' type='button' class= 'btn btn-success' style='margin-top: 5px; padding: 3px 9px;'><i class='fa fa-edit'></i> Modifica</a> <button type='button' data-id='" + value['id'] + "' id='panorama-remove" + value['id'] + "' class= 'btn btn-danger' style='margin-top: 5px; padding: 3px 9px;'><i class='fa fa-trash'></i> Elimina</button>"
+                    content: "<div style='width: 500px;'><div>" + value['panorama'] + "</div><img src='../textures/" + value['panorama'] + "' width='100%' height='auto'></div><a target='_blank' href='../index.html?id=" + value['id'] + "' class='btn btn-primary' style='margin-top: 5px; padding: 3px 9px;'><i class='fa fa-eye'></i> Visualizza</a> <a href='?page=panorama-detail&id=" + value['id'] + "' type='button' class= 'btn btn-success' style='margin-top: 5px; padding: 3px 9px;'><i class='fa fa-edit'></i> Modifica</a> <button type='button' data-id='" + value['id'] + "' id='panorama-remove" + value['id'] + "' class= 'btn btn-danger' style='margin-top: 5px; padding: 3px 9px;'><i class='fa fa-trash'></i> Elimina</button>"
                 });
 
                 google.maps.event.addListener(marker, 'click', function() {

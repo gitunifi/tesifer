@@ -38,8 +38,8 @@ $(document).ready(function() {
                     ');
 
                     $("#drag-hotspot" + value['id']).draggable({ containment: "#drag1-wrapper", scroll: false, axis: "x"});
-                    $("#drag-hotspot" + value['id']).css("left", (parseInt(value['x']) * $("#drag1-wrapper").width() / 360) + "px");
-                    $("#drag-hotspot" + value['id']).css("top", (parseInt(value['y']) + $("#drag1-wrapper").height()/2 - $("#drag-hotspot" + value['id']).height()/2) + "px");
+                    $("#drag-hotspot" + value['id']).css("left", (parseInt(value['angolo']) * $("#drag1-wrapper").width() / 360) + "px");
+                    $("#drag-hotspot" + value['id']).css("top", ($("#drag1-wrapper").height()/2 - $("#drag-hotspot" + value['id']).height()/2) + "px");
                 }
             });
         }
@@ -129,7 +129,7 @@ $(document).ready(function() {
                 dataType: "json",
                 context: this
             }).done(function(response) {
-                location.reload();
+                //location.reload();
             });
         });
     });

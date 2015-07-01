@@ -109,21 +109,7 @@ function onDocumentMouseUp(event) {
 
 function onDocumentMouseWheel(event) {
     event.preventDefault();
-    var sub = fov - Math.min((event.wheelDeltaY * 0.05), 2);
-    if (maxZoom <= sub && sub <= minZoom) {
-        // WebKit
-        if (event.wheelDeltaY) {
-            fov -= Math.min((event.wheelDeltaY * 0.05), 2);
-            // Opera / Explorer 9
-        } else if (event.wheelDelta) {
-            fov -= Math.min((event.wheelDelta * 0.05), 2);
-            // Firefox
-        } else if (event.detail) {
-            fov += Math.min((event.detail * 1.0), 2);
-        }
-        camera.projectionMatrix.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
-    }
-    /*if (zoomEnabled) {
+    if (zoomEnabled) {
         if (!amILoading) {
             //var previousFov = fov;
             var delta;
@@ -172,7 +158,7 @@ function onDocumentMouseWheel(event) {
             }
 
         }
-    }*/
+    }
 }
 
 function onDocumentDoubleclick(event) {
@@ -237,7 +223,6 @@ function isZoomIn(previousFov, fov) {
 }
 
 
-//FIXME: non è proprio precisissima a quanto pare
 function XYZtoLonLat(x, y, z) {
     var lonLat = [];
     lonLat[1] = Math.acos(y / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2))) - Math.PI / 2;
@@ -248,7 +233,7 @@ function XYZtoLonLat(x, y, z) {
     else
         lonLat[0] = Math.atan(z / x) + Math.PI;
     lonLat[0] *= 180 / Math.PI;
-    lonLat[0] = mod(lonLat[0], 360); //BOH
+    //lonLat[0] = mod(lonLat[0], 360); //BOH
     return lonLat;
 }
 
