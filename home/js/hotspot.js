@@ -50,7 +50,7 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
         //ATTENZIONE!!! la dimensione del box nero non viene modificata insieme alla dimensione del contenuto!
         var xDimension = 400;
         var yDimension = 200;
-        var planeGeometry = new THREE.PlaneGeometry(xDimension, yDimension);
+        var planeGeometry = new THREE.PlaneBufferGeometry(xDimension, yDimension);
         //larghezza del semicerchio nella cornice
         var inside = 40; //15
         //altezza del semicerchio nella cornice
@@ -64,37 +64,20 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
         objects.push(frame);
 
         planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-        planeMesh.position.x = hotspotPosition.x;
-        planeMesh.position.y = hotspotPosition.y;
-        planeMesh.position.z = hotspotPosition.z;
+        planeMesh.position.set(hotspotPosition.x, hotspotPosition.y, hotspotPosition.z);
 
 
 
         planeMesh.url = html;
 
-        //distanza del contenuto dalla sfera
-        var distance = (planeMesh.geometry.width / 2) + 15;
+        var distance = (xDimension / 2) + 15;
 
-        var angle;
-        if (planeMesh.position.x >= 0) {
-            angle = Math.atan(planeMesh.position.z / planeMesh.position.x);
-            distance = -distance;
-        }
-        else {
-            angle = Math.atan(planeMesh.position.z / planeMesh.position.x);
-        }
-
-
-
+        planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
         if (leftOrRight === "left") {
-            planeMesh.position.x -= distance * Math.sin(angle);
-            planeMesh.position.z += distance * Math.cos(angle);
+            planeMesh.translateX(-distance);
+        } else {
+            planeMesh.translateX(distance);
         }
-        else {
-            planeMesh.position.x += distance * Math.sin(angle);
-            planeMesh.position.z -= distance * Math.cos(angle);
-        }
-
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
 
 
@@ -115,8 +98,11 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
         cssObject = new THREE.CSS3DObject(element);
 
         //adattamento delle dimensioni, ridimensionando anche il contenuto
-        cssObject.scale.x /= resolution;
-        cssObject.scale.y /= resolution;
+
+
+        cssObject.scale.setX(cssObject.scale.x / resolution);
+        cssObject.scale.setY(cssObject.scale.y / resolution);
+
 
         /*
          Il parametro risoluzione serve a far visualizzare più o meno contenuto:
@@ -125,8 +111,9 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
          0.5 viene incluso la metà del contenuto;
          */
 
-        cssObject.position = new THREE.Vector3(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
-        cssObject.rotation = planeMesh.rotation;
+        cssObject.position.set(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
+        cssObject.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
+
 
         //inserimento dell'oggetto all'interno del riquadro nero
         cssScene.add(cssObject);
@@ -134,12 +121,13 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
 
         var response = XYZtoLonLat(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
         smoothLonLatTransition(response[0], response[1], 3);
-        frame.position = new THREE.Vector3(planeMesh.position.x - 1, planeMesh.position.y, planeMesh.position.z - planeMesh.position.z / planeMesh.position.x);
-        frame.rotation = new THREE.Vector3(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
-        if (leftOrRight === "left") {
-            frame.rotation.y += Math.PI;
-        }
+        frame.position.set(planeMesh.position.x - 1, planeMesh.position.y, planeMesh.position.z - planeMesh.position.z / planeMesh.position.x);
 
+        if (leftOrRight === "left") {
+            frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y + Math.PI, planeMesh.rotation.z);
+        } else {
+            frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
+        }
         scene.add(frame);
     }
 }
@@ -196,7 +184,7 @@ function restoreHotspotPosition(hotspotId) {
             i++;
     }
     if (selectedFrame !== undefined)
-        selectedFrame.position = new THREE.Vector3(markers[i].position.x, markers[i].position.y, markers[i].position.z);
+        selectedFrame.position.set(markers[i].position.x, markers[i].position.y, markers[i].position.z);
 }
 
 function rotateToHotspotPosition() {
@@ -220,6 +208,7 @@ function indentLeft(indent) {
 function manageHotspot() {
 
     cleanUpHotSpotContent();
+    console.log(interactiveObject.position);
     //restoreHotspotPosition(interactiveObject.hotspotId);
     hotspotArray = getContent("hotspotInfo", interactiveObject.hotspotId);
 
@@ -315,7 +304,7 @@ function manageHotspot() {
 
 function makeHotspot(position, id) {
     var pts = [];
-    var detail = 0.1;
+    var detail = 1;
     var radius = 25;
     var radius2 = 12.5;
 
@@ -361,7 +350,7 @@ function makeHotspot(position, id) {
 
     var torusMaterial = new THREE.MeshFaceMaterial(materials1);
     var torus1 = new THREE.Mesh(torusGeometry, torusMaterial);
-    torus1.position = new THREE.Vector3(position.x, position.y, position.z);
+    torus1.position.set(position.x, position.y, position.z);
     torus1.lookAt(new THREE.Vector3(0, 0, 0));
     torus1.rotation.z = torus1.rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
     torus1.name = "Panorama";
@@ -386,7 +375,7 @@ function makeHotspot(position, id) {
     }
     var torusMaterial = new THREE.MeshFaceMaterial(materials2);
     var torus2 = new THREE.Mesh(torusGeometry, torusMaterial);
-    torus2.position = new THREE.Vector3(position.x, position.y, position.z);
+    torus2.position.set(position.x, position.y, position.z);
     torus2.lookAt(new THREE.Vector3(0, 0, 0));
     torus2.rotation.z = torus2.rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
     torus2.name = "Gallery";
@@ -411,7 +400,7 @@ function makeHotspot(position, id) {
     }
     var torusMaterial = new THREE.MeshFaceMaterial(materials3);
     var torus3 = new THREE.Mesh(torusGeometry, torusMaterial);
-    torus3.position = new THREE.Vector3(position.x, position.y, position.z);
+    torus3.position.set(position.x, position.y, position.z);
     torus3.lookAt(new THREE.Vector3(0, 0, 0));
     torus3.rotation.z = torus3.rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
     torus3.name = "PDF";
@@ -436,7 +425,7 @@ function makeHotspot(position, id) {
     }
     var torusMaterial = new THREE.MeshFaceMaterial(materials4);
     var torus4 = new THREE.Mesh(torusGeometry, torusMaterial);
-    torus4.position = new THREE.Vector3(position.x, position.y, position.z);
+    torus4.position.set(position.x, position.y, position.z);
     torus4.lookAt(new THREE.Vector3(0, 0, 0));
     torus4.rotation.z = torus4.rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
     torus4.name = "Object";
@@ -494,7 +483,7 @@ function makeHotspot(position, id) {
     markers.push(arrow);
     arrow.name = "Sphere"; //"Arrow"?
     arrow.hotspotId = id;
-    arrow.position = new THREE.Vector3(position.x, position.y, position.z);
+    arrow.position.set(position.x, position.y, position.z);
     arrow.lookAt(new THREE.Vector3(0, 0, 0));
     //arrow.rotation.y = angolo;
     //arrow.rotation.y = arrow.rotation.y + Math.PI / 2 + Math.atan(parseFloat(arrow.position.z) / parseFloat(arrow.position.x)); //FIXME
@@ -508,7 +497,7 @@ function dragHotspot(hotspotId, position) {
         position.y,
         0.5 );
 
-    projector.unprojectVector(vector, camera);
+    vector.unproject(camera);
 
     var dir = vector.sub( camera.position ).normalize();
 
@@ -522,7 +511,7 @@ function dragHotspot(hotspotId, position) {
 
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].hotspotId === hotspotId) {
-            markers[i].position = pos;
+            markers[i].position.set(pos.x, pos.y, pos.z);
             markers[i].lookAt(new THREE.Vector3(0, 0, 0));
             if (markers[i].name == "Object") {
                 markers[i].rotation.z = markers[i].rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;

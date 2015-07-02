@@ -20,7 +20,7 @@ function render() {
     camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
     camera.target.y = 500 * Math.cos(phi);
     camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-    camera.lookAt(camera.target);
+    //camera.lookAt(camera.target);
     renderer.render(scene, camera);
     if (typeof rendererCSS !== "undefined") {
         rendererCSS.render(cssScene, camera);
@@ -53,7 +53,7 @@ function onDocumentMouseDown(event) {
     var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
     var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
     var vector = new THREE.Vector3(mouseX, mouseY, 0.5);
-    projector.unprojectVector(vector, camera);
+    vector.unproject(camera);
     var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
 
     if (typeof markers != "undefined" && markers !== undefined) {

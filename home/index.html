@@ -41,7 +41,7 @@
 <div id="mapdiv"></div>
 <div id="info">MICC - Media Integration and Communication Center
     <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-    <script src="jslibraries/Three58.js"></script>
+    <script src="jslibraries/three.min.js"></script>
     <script src="js/ajax.js"></script>
     <script src="jslibraries/helvetiker_regular.typeface.js"></script>
     <script src="jslibraries/CSS3DRenderer.js"></script>
@@ -76,9 +76,10 @@
             onMouseDownMouseX = 0, onMouseDownMouseY = 0,
             lon = 0, onMouseDownLon = 0,
             lat = 0, onMouseDownLat = 0,
+            x = 0, y = 0, z = 0,
             phi = 0, theta = 0,
             latLimit = -30,
-            projector, panoId = 8,
+            panoId = 8,
             minZoom = 70, maxZoom = 20,
             interactiveObject,
             selectedFrame,
@@ -128,7 +129,6 @@
             camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1100);
             camera.target = new THREE.Vector3(0, 0, 0);
             scene = new THREE.Scene();
-            projector = new THREE.Projector();
             var panoName = getContent("panorama", panoId).pop()['Panorama'];
             getHotspot();
             var texture = THREE.ImageUtils.loadTexture('textures/' + panoName);
@@ -147,8 +147,7 @@
             textTexture.needsUpdate = true;
             var spriteMaterial = new THREE.SpriteMaterial({
                 map: textTexture,
-                useScreenCoordinates: true,
-                alignment: THREE.SpriteAlignment.topLeft
+                useScreenCoordinates: true
             });
             sprite = new THREE.Sprite(spriteMaterial);
             sprite.scale.set(200, 100, 1.0);
@@ -180,11 +179,9 @@
             rendererCSS.domElement.style.top = 100;
             rendererCSS.domElement.style.margin = 0;
             rendererCSS.domElement.style.padding = 0;
+            rendererCSS.domElement.style.zIndex = 1000;
             container.appendChild(rendererCSS.domElement);
-            renderer.domElement.style.position = 'absolute';
-            renderer.domElement.style.top = 0;
-            renderer.domElement.style.zIndex = 1;
-            rendererCSS.domElement.appendChild(renderer.domElement);
+            container.appendChild(rendererCSS.domElement);
             makeMap();
         }
 
