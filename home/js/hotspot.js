@@ -10,7 +10,7 @@ function getHotspot() {
     var hotspotArray = getContent("hotspot", panoId);
     for (var i = 0; i < hotspotArray.length; i++) {
         var hotspot = hotspotArray[i];
-        var position = new THREE.Vector3(parseInt(hotspot['xPosition']*210), parseInt(hotspot['yPosition']), parseInt(hotspot['zPosition']*210));
+        var position = new THREE.Vector3(parseInt(hotspot['xPosition']*180), parseInt(hotspot['yPosition']), parseInt(hotspot['zPosition']*180));
         makeHotspot(position, hotspot['IdHotspot']);
     }
 }
@@ -38,7 +38,7 @@ function cleanUpMarkers() {
 }
 
 
-function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolution, rotation) {
+function portal(html, hotspotPosition, width, height, leftOrRight, color, resolution, rotation) {
     var clickable = html.split("?")[0];
     if (clickable !== "null") {
         zoomEnabled = false;
@@ -52,9 +52,9 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
         var yDimension = 200;
         var planeGeometry = new THREE.PlaneBufferGeometry(xDimension, yDimension);
         //larghezza del semicerchio nella cornice
-        var inside = 40; //15
+        var inside = 27; //15
         //altezza del semicerchio nella cornice
-        var radius = 55;
+        var radius = 60;
         //larghezza della cornice attaccata alla sfera, deve essere più larga perché ha l'incavatura
         var corniceLarga = 50; //25
         //larghezza degli altri lati della cornice
@@ -70,7 +70,7 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
 
         planeMesh.url = html;
 
-        var distance = (xDimension / 2) + 15;
+        var distance = (xDimension / 2) + 12;
 
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
         if (leftOrRight === "left") {
@@ -121,7 +121,7 @@ function portal(html, hotspotPosition, width, heigth, leftOrRight, color, resolu
 
         var response = XYZtoLonLat(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
         smoothLonLatTransition(response[0], response[1], 3);
-        frame.position.set(planeMesh.position.x - 1, planeMesh.position.y, planeMesh.position.z - planeMesh.position.z / planeMesh.position.x);
+        frame.position.set(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
 
         if (leftOrRight === "left") {
             frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y + Math.PI, planeMesh.rotation.z);
@@ -208,7 +208,6 @@ function indentLeft(indent) {
 function manageHotspot() {
 
     cleanUpHotSpotContent();
-    console.log(interactiveObject.position);
     //restoreHotspotPosition(interactiveObject.hotspotId);
     hotspotArray = getContent("hotspotInfo", interactiveObject.hotspotId);
 
@@ -237,7 +236,9 @@ function manageHotspot() {
                 rotate(-Math.PI / 2);
                 selectedFrame = undefined;
                 cleanUpHotSpotContent(interactiveObject.hotspotId);
-                rotateToHotspotPosition();
+                //rotateToHotspotPosition();
+                var response = XYZtoLonLat(interactiveObject.position.x, interactiveObject.position.y, interactiveObject.position.z);
+                smoothLonLatTransition(response[0], response[1], 3);
             }
             break;
         case "Object":
@@ -246,7 +247,7 @@ function manageHotspot() {
                     rotate(Math.PI / 2);
                 rightPosition = false;
                 var hotspotInfo = search("Object");
-                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", 0xa1cc3a, 1);
+                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "left", 0xa1cc3a, 1);
                 //indentRight(indent);
                 selectedFrame = interactiveObject;
 
@@ -257,7 +258,9 @@ function manageHotspot() {
                 rotate(-Math.PI / 2);
                 selectedFrame = undefined;
                 cleanUpHotSpotContent(interactiveObject.hotspotId);
-                rotateToHotspotPosition();
+                //rotateToHotspotPosition();
+                var response = XYZtoLonLat(interactiveObject.position.x, interactiveObject.position.y, interactiveObject.position.z);
+                smoothLonLatTransition(response[0], response[1], 3);
             }
             break;
         case "Panorama":
@@ -275,7 +278,9 @@ function manageHotspot() {
                 rightPosition = false;
                 rotate(Math.PI / 2);
                 cleanUpHotSpotContent(interactiveObject.hotspotId);
-                rotateToHotspotPosition();
+                //rotateToHotspotPosition();
+                var response = XYZtoLonLat(interactiveObject.position.x, interactiveObject.position.y, interactiveObject.position.z);
+                smoothLonLatTransition(response[0], response[1], 3);
                 selectedFrame = undefined;
             }
             break;
@@ -286,7 +291,7 @@ function manageHotspot() {
                 rightPosition = true;
                 var hotspotInfo = search("PDF");
                 var pdfSource = getContent("pdf", hotspotInfo['IdName']); //FIXME Meglio passare id
-                portal(hotspotInfo['Source'] + "?id=" + pdfSource, interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "left", 0xe1235e, 2);
+                portal(hotspotInfo['Source'] + "?id=" + pdfSource, interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", 0xe1235e, 2);
                 //indentLeft(indent);
                 selectedFrame = interactiveObject;
             }
@@ -295,7 +300,9 @@ function manageHotspot() {
                 rightPosition = false;
                 rotate(Math.PI / 2);
                 cleanUpHotSpotContent(interactiveObject.hotspotId);
-                rotateToHotspotPosition();
+                //rotateToHotspotPosition();
+                var response = XYZtoLonLat(interactiveObject.position.x, interactiveObject.position.y, interactiveObject.position.z);
+                smoothLonLatTransition(response[0], response[1], 3);
                 selectedFrame = undefined;
             }
             break;
@@ -501,7 +508,7 @@ function dragHotspot(hotspotId, position) {
 
     var dir = vector.sub( camera.position ).normalize();
 
-    var distance = 210;
+    var distance = 180;
 
     var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
     pos.y = 0;

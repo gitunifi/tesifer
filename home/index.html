@@ -71,12 +71,11 @@
         var interactiveTexts = []; //Interactive click on Text
         var markers = []; //Hotspot
         var menuPoints = []; //Interactive menu
-        var dragHotspotId = null;
+        var dragHotspotId = -1;
         var fov = 70,
             onMouseDownMouseX = 0, onMouseDownMouseY = 0,
             lon = 0, onMouseDownLon = 0,
             lat = 0, onMouseDownLat = 0,
-            x = 0, y = 0, z = 0,
             phi = 0, theta = 0,
             latLimit = -30,
             panoId = 8,
@@ -127,7 +126,8 @@
             //fadeEffect.init('container', 1);
             var container = document.getElementById('container');
             camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1100);
-            camera.target = new THREE.Vector3(0, 0, 0);
+            camera.position.set(0, 0, 0);
+            camera.target = new THREE.Vector3(200, 0, 0);
             scene = new THREE.Scene();
             var panoName = getContent("panorama", panoId).pop()['Panorama'];
             getHotspot();
@@ -135,6 +135,7 @@
             var geometry = new THREE.SphereGeometry(500, 60, 60);
             mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({map: texture}));
             mesh.scale.x = -1;
+            mesh.position.set(0, 0, 0);
             scene.add(mesh);
             var pointLight = new THREE.PointLight(0xFFFFFF);
             scene.add(pointLight);
@@ -244,8 +245,93 @@
 
         function smoothLonLatTransition(targetLon, targetLat, step) {
             var stepsNeeded;
-            var lonDistance = Math.abs(lon - targetLon);
-            var latDistance = Math.abs(lat - targetLat);
+
+            var lonDistance = 0;
+            var latDistance = 0;
+            var lonInvert = false;
+            var latInvert = true;
+
+            if (lon >= 0 && targetLon > 0) {
+                lonDistance = Math.abs(lon - targetLon);
+                if (lonDistance < 180) {
+                    if (targetLon < lon) lonInvert = true;
+                } else {
+                    if (targetLon > lon) lonInvert = true;
+                }
+            } else if (lon >= 0 && targetLon < 0) {
+                targetLon = 360 + targetLon;
+
+                lonDistance = Math.abs(lon - targetLon);
+                if (lonDistance < 180) {
+                    if (targetLon < lon) lonInvert = true;
+                } else {
+                    if (targetLon > lon) lonInvert = true;
+                }
+            } else if (lon < 0 && targetLon >= 0) {
+                var newLon = 360 + lon;
+                lonDistance = Math.abs(newLon - targetLon);
+                if (lonDistance < 180) {
+                    if (targetLon < newLon) lonInvert = true;
+                } else {
+                    if (targetLon > newLon) lonInvert = true;
+                }
+            } else if (lon < 0 && targetLon < 0) {
+                var newLon = 360 + lon;
+                targetLon = 360 + targetLon;
+                lonDistance = Math.abs(newLon - targetLon);
+                if (lonDistance < 180) {
+                    if (targetLon < newLon) lonInvert = true;
+                } else {
+                    if (targetLon > newLon) lonInvert = true;
+                }
+            }
+            if (lonDistance > 180) {
+                lonDistance = 360 - lonDistance;
+            }
+
+
+
+            if (lat >= 0 && targetLat > 0) {
+                latDistance = Math.abs(lat - targetLat);
+                if (latDistance < 180) {
+                    if (targetLat < lat) latInvert = true;
+                } else {
+                    if (targetLat > lat) latInvert = true;
+                }
+            } else if (lat >= 0 && targetLat < 0) {
+                targetLat = 360 + targetLat;
+
+                latDistance = Math.abs(lat - targetLat);
+                if (latDistance < 180) {
+                    if (targetLat < lat) latInvert = true;
+                } else {
+                    if (targetLat > lat) latInvert = true;
+                }
+            } else if (lat < 0 && targetLat >= 0) {
+                var newLat = 360 + lat;
+                latDistance = Math.abs(newLat - targetLat);
+                if (latDistance < 180) {
+                    if (targetLat < newLat) latInvert = true;
+                } else {
+                    if (targetLat > newLat) latInvert = true;
+                }
+            } else if (lat < 0 && targetLat < 0) {
+                var newLat = 360 + lat;
+                targetLat = 360 + targetLat;
+                latDistance = Math.abs(newLat - targetLat);
+                if (latDistance < 180) {
+                    if (targetLat < newLat) latInvert = true;
+                } else {
+                    if (targetLat > newLat) latInvert = true;
+                }
+            }
+            if (latDistance > 180) {
+                latDistance = 360 - latDistance;
+            }
+
+
+            //var lonDistance = Math.abs(lon - targetLon);
+            //var latDistance = Math.abs(lat - targetLat);
 
             if (lonDistance > latDistance) {
                 stepsNeeded = Math.floor(lonDistance / step);
@@ -257,11 +343,11 @@
             var lonStep = lonDistance / stepsNeeded;
             var latStep = latDistance / stepsNeeded;
 
-            if (targetLon < lon) {
+            if (lonInvert) {
                 lonStep = 0 - lonStep;
             }
 
-            if (targetLat < lat) {
+            if (!latInvert) {
                 latStep = 0 - latStep;
             }
 

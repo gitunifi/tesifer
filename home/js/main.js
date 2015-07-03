@@ -20,7 +20,7 @@ function render() {
     camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
     camera.target.y = 500 * Math.cos(phi);
     camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-    //camera.lookAt(camera.target);
+    camera.lookAt(camera.target);
     renderer.render(scene, camera);
     if (typeof rendererCSS !== "undefined") {
         rendererCSS.render(cssScene, camera);
@@ -44,7 +44,7 @@ function onDocumentMouseDown(event) {
     if (event.which === 3) {
         isRightClick = true;
     }
-    dragHotspotId = false;
+    dragHotspotId = -1;
     isUserInteracting = true;
     onPointerDownPointerX = event.clientX;
     onPointerDownPointerY = event.clientY;
@@ -55,7 +55,6 @@ function onDocumentMouseDown(event) {
     var vector = new THREE.Vector3(mouseX, mouseY, 0.5);
     vector.unproject(camera);
     var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-
     if (typeof markers != "undefined" && markers !== undefined) {
         var intersects = raycaster.intersectObjects(markers, true);
         if (intersects[0] !== undefined) {
@@ -104,7 +103,7 @@ function onDocumentMouseMove(event) {
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
-    if (dragHotspotId) {
+    if (typeof dragHotspotId != "undefined" && dragHotspotId != -1) {
         dragHotspot(dragHotspotId, mouse);
     }
 }
@@ -112,14 +111,14 @@ function onDocumentMouseMove(event) {
 function onDocumentMouseUp(event) {
     event.preventDefault();
     isRightClick = false;
-    dragHotspotId = null;
+    dragHotspotId = -1;
     isUserInteracting = false;
     interactiveObject = undefined;
 }
 
 function onDocumentMouseWheel(event) {
     event.preventDefault();
-    if (zoomEnabled) {
+    if (typeof zoomEnabled != "undefined" && zoomEnabled) {
         if (!amILoading) {
             //var previousFov = fov;
             var delta;
@@ -132,9 +131,14 @@ function onDocumentMouseWheel(event) {
             }
             var sub = fov - Math.min((delta * 0.05), 2);
             var zoom = maxZoom;
+            var posLat = -1;
+            var posLon = -1;
+            var beforeFov = fov;
             var indice = whichTransitionDirection();
             if (indice !== undefined & delta > 0) {
                 zoom = ZoomArray[indice]['ZoomNext'];
+                posLat = ZoomArray[indice]['Latitude'];
+                posLon = ZoomArray[indice]['Longitude'];
             }
             if (zoom <= sub && sub <= minZoom) {
                 if (event.wheelDeltaY) {
@@ -143,6 +147,15 @@ function onDocumentMouseWheel(event) {
                     fov -= Math.min((delta * 0.05), 2);
                 } else if (event.detail) {
                     fov += Math.min((delta * 1.0), 2);
+                }
+
+                if (posLat != -1 && posLon != -1) {
+                    var current_diff = beforeFov - fov;
+                    var total_diff = beforeFov - zoom;
+                    var diff_lon = lon - posLon;
+                    var diff_lat = lat - posLat;
+                    lon -= diff_lon * (current_diff / total_diff);
+                    lat -= diff_lat * (current_diff / total_diff);
                 }
 
                 if (planeMesh !== undefined) {
@@ -156,7 +169,7 @@ function onDocumentMouseWheel(event) {
                 getNewPanorama(panoId);
             }
             //Zoom Previous
-            if (delta < 0 & fov > 69.) { // 69. FIXME
+            /*if (delta < 0 && fov > 69.) { // 69. FIXME
                 var previousPanoArray = getContent("previousPano", panoId);
                 while (previousPanoArray.length > 0) {
                     var candidatePreviousPano = previousPanoArray.pop();
@@ -165,7 +178,7 @@ function onDocumentMouseWheel(event) {
                         load(candidatePreviousPano['IdCalling'], candidatePreviousPano['Latitude'], candidatePreviousPano['Longitude']);
                     }
                 }
-            }
+            }*/
 
         }
     }
