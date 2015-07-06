@@ -35,7 +35,7 @@ class Autocomplete
 		{	
 			if ($k == 0)
 				$sql .= "Subject Like '%".$pieces[$k]."%'";
-			else
+			elseif ($pieces[$k] != "" && $pieces[$k] != null)
 				$sql .= " OR Subject Like '%".$pieces[$k]."%'";
 		}
 		$sql .= ")";

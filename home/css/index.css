@@ -94,6 +94,7 @@ body {
     position: absolute;
     bottom: 20%;
     left: 47%;
+    z-index: 2000;
 }
 
 #NavButtons{
@@ -260,7 +261,12 @@ span{
     bottom:0;
     right:0px;
     width:25%;
-    height:25%;
+    height:20%;
+    z-index: 2000;
+}
+
+#search-button {
+    cursor: pointer;
 }
 
 .olControlAttribution.olControlNoSelect{
