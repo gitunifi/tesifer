@@ -41,28 +41,29 @@
 <div id="container">
 </div>
 <div id="mapdiv"></div>
-<div id="info">MICC - Media Integration and Communication Center
-    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-    <script src="jslibraries/three.min.js"></script>
-    <script src="js/ajax.js"></script>
-    <script src="jslibraries/helvetiker_regular.typeface.js"></script>
-    <script src="jslibraries/CSS3DRenderer.js"></script>
-    <script src="js/main.js"></script>
-    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
-    <script src="js/hotspot.js"></script>
-    <div id="project-label">
-        <img src="images/loading1.gif" id="imgLoader"/>
-        <script>
-            document.getElementById('imgLoader').style.display = "none";
-        </script>
-    </div>
+<div style="z-index: 2000; position: relative;">
+    <div align="center" style="color: black;">MICC - Media Integration and Communication Center</div>
     <div id="NavButtons">
         <button class="myButton" id="goUp" onclick="goUp()"><span class="fa bottoneSu"></span></button>
-        <button class="myButton" id="goToLeft" onclick="goToLeft()"><span class="fa bottoneSinistra"></span></button>
+        <button class="myButton" style="margin-left: 53px;" id="goToLeft" onclick="goToLeft()"><span class="fa bottoneSinistra"></span></button>
         <button class="myButton" id="goToRight" onclick="goToRight()"><span class="fa bottoneDestra"></span></button>
         <button class="myButton" id="goDown" onclick="goDown()"><span class="fa bottoneGiu"></span></button>
     </div>
-
+</div>
+<div id="project-label">
+    <img src="images/loading1.gif" id="imgLoader"/>
+    <script>
+        document.getElementById('imgLoader').style.display = "none";
+    </script>
+</div>
+<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+<script src="jslibraries/three.min.js"></script>
+<script src="js/ajax.js"></script>
+<script src="jslibraries/helvetiker_regular.typeface.js"></script>
+<script src="jslibraries/CSS3DRenderer.js"></script>
+<script src="js/main.js"></script>
+<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+<script src="js/hotspot.js"></script>
     <script>
         var camera, scene, renderer, mesh, cssScene, rendererCSS, planeMesh, element, cssObject;
         var objects = [];
@@ -451,6 +452,6 @@
             });
         }
     </script>
-</div>
+
 </body>
 </html>
