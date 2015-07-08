@@ -13,7 +13,7 @@
 </div>
 <div id="info">MICC - Media Integration and Communication Center
 
-    <script type="text/javascript" src="jslibraries/Three58.js"></script>
+    <script type="text/javascript" src="jslibraries/three.min.js"></script>
     <script type="text/javascript" src="jslibraries/jquery.min.js"></script>
     <script type="text/javascript" src="js/ajax.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
@@ -25,7 +25,7 @@
         var interactiveTexts = []; //Interactive click on Text
         var markers = []; //Hotspot
         var menuPoints = []; //Interactive menu
-
+        var ZoomArray = [{"ZoomNext": 60}];
         var fov = 70,
             texture,
             isUserInteracting = false,
@@ -34,7 +34,7 @@
             lat = 0, onMouseDownLat = 0,
             phi = 0, theta = 0,
             latLimit = -30,
-            projector, panoId,
+            panoId,
             minZoom = 70, maxZoom = 20,
             interactiveObject,
             onMouseDownObjectXRotation,
@@ -51,7 +51,6 @@
             camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1100);
             camera.target = new THREE.Vector3(0, 0, 0);
             scene = new THREE.Scene();
-            projector = new THREE.Projector();
 
             var splitArray = window.location.search.split("=");
             panoId = splitArray[1];
@@ -75,6 +74,10 @@
             document.addEventListener('DOMMouseScroll', onDocumentMouseWheel, false);
             document.addEventListener('dblclick', onDocumentDoubleclick, false);
             window.addEventListener('resize', onWindowResize, false);
+
+        }
+
+        function getNewPanorama() {
 
         }
     </script>

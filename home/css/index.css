@@ -97,13 +97,19 @@ body {
     z-index: 2000;
 }
 
+.copyright {
+    font-family: Monospace;
+    font-size: 13px;
+    color: white;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
 #NavButtons{
 	position: absolute;
     z-index: 2000;
-    right: 0;
-	/*margin: 20% 2%;*/
-	height: 15em;
-	width: 15em;
+    top: 5px;
+    right: 5px;
     opacity: 0.85; 
 }
 

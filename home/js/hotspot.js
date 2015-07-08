@@ -38,7 +38,7 @@ function cleanUpMarkers() {
 }
 
 
-function portal(html, hotspotPosition, width, height, leftOrRight, color, resolution, rotation) {
+function portal(html, hotspotPosition, width, height, leftOrRight, color, resolution, type) {
     var clickable = html.split("?")[0];
     if (clickable !== "null") {
         zoomEnabled = false;
@@ -66,6 +66,42 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
         planeMesh.position.set(hotspotPosition.x, hotspotPosition.y, hotspotPosition.z);
 
+        //var hotspotExternalMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1});
+        var image;
+        if (type == "Panorama") {
+            image = [
+                new THREE.MeshLambertMaterial({
+                    map: THREE.ImageUtils.loadTexture('images/pano_icon_vertical.png')
+                })
+            ];
+        } else if (type == "Gallery") {
+            image = [
+                new THREE.MeshLambertMaterial({
+                    map: THREE.ImageUtils.loadTexture('images/gallery_icon_horizontal.png')
+                })
+            ];
+        } else if (type == "PDF") {
+            image = [
+                new THREE.MeshLambertMaterial({
+                    map: THREE.ImageUtils.loadTexture('images/pdf_icon_horizontal_reflected.png')
+                })
+            ];
+        } else if (type == "Object") {
+            image = [
+                new THREE.MeshLambertMaterial({
+                    map: THREE.ImageUtils.loadTexture('images/3d_icon_horizontal.png')
+                })
+            ];
+        }
+        //var hotspotExternalMaterial = new THREE.MeshFaceMaterial(image);
+        //var hotspotExternalGeometry = new THREE.PlaneBufferGeometry(60, 20);
+        //hotspotExternalMesh = new THREE.Mesh(hotspotExternalGeometry, hotspotExternalMaterial);
+
+        elementExternaLink.href = html;
+        elementExternaLink.target = "_blank";
+        elementExternaLink.innerHTML = "<img src='images/external_link.png' width='16' height='auto'/>";
+        elementExternaLink.position = "absolute";
+        hotspotExternalMesh = new THREE.CSS3DObject(elementExternaLink);
 
 
         planeMesh.url = html;
@@ -79,6 +115,12 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
             planeMesh.translateX(distance);
         }
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
+
+        hotspotExternalMesh.position.set(planeMesh.position.x, planeMesh.position.y - (yDimension / 2) - 10, planeMesh.position.z);
+        hotspotExternalMesh.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
+
+        cssScene.add(hotspotExternalMesh);
+        cssObjects.push(hotspotExternalMesh);
 
 
 
@@ -233,7 +275,7 @@ function manageHotspot() {
                 rotate(Math.PI / 2);
                 rightPosition = false;
                 var hotspotInfo = search("Gallery");
-                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "left", 0xfcd402, 1.87);
+                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "left", 0xfcd402, 1.87, "Gallery");
                 //indentRight(indent);
                 selectedFrame = interactiveObject;
             }
@@ -254,7 +296,7 @@ function manageHotspot() {
                 rightPosition = false;
                 var hotspotInfo = search("PDF");
                 var pdfSource = getContent("pdf", hotspotInfo['IdName']); //FIXME Meglio passare id
-                portal(hotspotInfo['Source'] + "?id=" + pdfSource, interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "left", 0xe1235e, 2);
+                portal(hotspotInfo['Source'] + "?id=" + pdfSource, interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "left", 0xe1235e, 2, "PDF");
                 //indentLeft(indent);
                 selectedFrame = interactiveObject;
             }
@@ -275,7 +317,7 @@ function manageHotspot() {
 
                 rightPosition = true;
                 var hotspotInfo = search("Panorama");
-                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", 0x00acec, 1);
+                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", 0x00acec, 1, "Panorama");
                 selectedFrame = interactiveObject;
                 //indentLeft(indent);
             }
@@ -296,7 +338,7 @@ function manageHotspot() {
                 rotate(Math.PI / 2);
                 rightPosition = true;
                 var hotspotInfo = search("Object");
-                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", 0xa1cc3a, 1);
+                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", 0xa1cc3a, 1, "Object");
                 //indentRight(indent);
                 selectedFrame = interactiveObject;
 
