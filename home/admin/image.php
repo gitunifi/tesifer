@@ -9,7 +9,7 @@ $image2 = imagecreatefromjpeg('cats2.jpg');
 $time = microtime(true);
 $ih = new IntegralHistogram();
 
-$res = $ih->search($image1, $image2, 10);
+$res = $ih->search($image1, $image2, 1);
 var_dump($res);
 $time2 = microtime(true);
 echo memory_get_usage()."<br>";
@@ -22,18 +22,24 @@ class IntegralHistogram {
 
     function __construct() {
         $this->bit = 2;
-        $this->bins = 1 << $this->bit;
+        $this->bins = 4;//1 << $this->bit;
         $this->bins2 = $this->bins * $this->bins;
+        $this->bins3 = 4;
         $this->nbit = 8 - $this->bit;
-        $this->target = array_fill( 0, $this->bins*$this->bins*$this->bins, 0 );
-        $this->num = 0;
+        $this->target = array_fill( 0, $this->bins3, 0 );
+        $this->max = 255. / $this->bins3;
     }
 
     public function bin($pixelColor)
     {
+
+
         $r = $pixelColor >> 16 & 0xFF;
         $g = $pixelColor >> 8 & 0xFF;
         $b = $pixelColor & 0xFF;
+
+        $s = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+        return intval($s/$this->max);
 
         $x1 = $r >> $this->nbit;
         $x2 = ($g >> $this->nbit)  * $this->bins;
@@ -53,7 +59,7 @@ class IntegralHistogram {
 
     public function createFromImage($image)
     {
-        $colors = array_fill(0, $this->bins * $this->bins * $this->bins, 0);
+        $colors = array_fill(0, $this->bins3, 0);
 
         $width = imagesx($image);
         $height = imagesy($image);
@@ -65,7 +71,7 @@ class IntegralHistogram {
             }
         }
         $norm = $width * $height;
-        $n = $this->bins * $this->bins * $this->bins;
+        $n = $this->bins3;
         for ($i = 0; $i < $n; $i++) {
             $colors[$i] = (floatval($colors[$i]) / $norm);
         }
@@ -86,7 +92,7 @@ class IntegralHistogram {
 
     public function createHistograms($imgSrcWidth, $imgSrcHeight)
     {
-        $n = $this->bins * $this->bins * $this->bins;
+        $n = $this->bins3;
         //$histograms = array_fill( 0, $imgSrcHeight*$imgSrcWidth, array_fill(0, $n, 0));
         //return $histograms;
         return [];
@@ -94,7 +100,7 @@ class IntegralHistogram {
 
     public function propagation($hists, $imgWidth, $imgHeight, $pxlArray)
     {
-        $count = $this->bins * $this->bins * $this->bins;
+        $count = $this->bins3;
         $hists[0][$this->bin($pxlArray[0])] = 1;
         for ($i = 1; $i < $imgWidth; $i++) {
             /*for ($k = 0; $k < $count; $k++) {
@@ -234,7 +240,7 @@ class IntegralHistogram {
     {
 
         $distance = 0;
-        $n = $this->bins * $this->bins * $this->bins;
+        $n = $this->bins3;
         for ($i = 0; $i < $n; $i++) {
             $intersection = 0;
             if (isset($currentHist[$i]))  $intersection += $currentHist[$i];

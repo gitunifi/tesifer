@@ -25,6 +25,16 @@ function render() {
     if (typeof rendererCSS !== "undefined") {
         rendererCSS.render(cssScene, camera);
     }
+    if (typeof pegman != "undefined" && pegman != undefined) {
+        var newL = lon;
+        if (newL < 0) newL = 360 + newL;
+        newL = mod(newL, 360);
+        var newY = offsetPegman * parseInt(newL / stepPegman);
+        if (pegmanicon.origin.y != newY) {
+            pegmanicon.origin.y = newY;
+            pegman.setIcon(pegmanicon);
+        }
+    }
 }
 
 function whichTransitionDirection() {

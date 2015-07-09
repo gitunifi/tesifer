@@ -77,6 +77,21 @@
         var dragHotspotId = -1;
         var hotspotExternalMesh;
         var elementExternaLink;
+        var stepPegman = 365 / 16;
+        var sizePegman = 40;
+        var offsetPegman = sizePegman+2.3;
+        var pegman;
+        var pegmanicon = {
+            url: 'images/pegman.png',
+            size: {
+                width: sizePegman,
+                height: sizePegman
+            },
+            origin: {
+                x: 0,
+                y: 0
+            }
+        };
         var fov = 70,
             onMouseDownMouseX = 0, onMouseDownMouseY = 0,
             lon = 0, onMouseDownLon = 0,
@@ -400,20 +415,32 @@
 
             var mapOptions = {
                 center: { lat: parseFloat(lat), lng: parseFloat(lng)},
-                zoom: 18
+                zoom: 15,
+                streetViewControl: false
             };
             map = new google.maps.Map(document.getElementById('mapdiv'), mapOptions);
 
+
+
             var hotspotArray = getContent("hotspotPlaced");
             $.each(hotspotArray, function(index, value) {
-                var icon = 'images/marker.png';
-                if (lat == parseFloat(value['EarthLatitude']) && lng == parseFloat(value['EarthLongitude']))
-                    icon = 'images/markerblue.png';
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(parseFloat(value['EarthLatitude']), parseFloat(value['EarthLongitude'])),
                     map: map,
-                    icon: icon,
+                    icon: {
+                        url: 'images/marker-pin.png',
+                        anchor: {
+                            x: 10,
+                            y: 28
+                        }
+                    },
                     title: value['Subject']
+                });
+
+                pegman = new google.maps.Marker({
+                    position: new google.maps.LatLng(parseFloat(lat), parseFloat(lng)),
+                    map: map,
+                    icon: pegmanicon
                 });
 
                 google.maps.event.addListener(marker, 'click', function(e) {
@@ -421,8 +448,10 @@
                     var yPosition = parseFloat(value['yPosition']);
                     var zPosition = parseFloat(value['zPosition']);
                     var response = XYZtoLonLat(xPosition, yPosition, zPosition);
-                    console.log(response);
-                    console.log(value['IdPanorama']);
+                    if (pegman != undefined) {
+                        pegmanicon.origin.y = offsetPegman * parseInt(response[0] / stepPegman);
+                        pegman.setIcon(pegmanicon);
+                    }
                     load(value['IdPanorama'], response[1], response[0], 0, 1000);
                     //load(12, 3, 0, 0, 100);
                     //load(11, -3, 0, 0, 100);

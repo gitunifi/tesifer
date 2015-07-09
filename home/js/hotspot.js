@@ -10,7 +10,7 @@ function getHotspot() {
     var hotspotArray = getContent("hotspot", panoId);
     for (var i = 0; i < hotspotArray.length; i++) {
         var hotspot = hotspotArray[i];
-        var position = new THREE.Vector3(parseInt(hotspot['xPosition']*180), parseInt(hotspot['yPosition']), parseInt(hotspot['zPosition']*180));
+        var position = new THREE.Vector3(parseInt(hotspot['xPosition']*210), parseInt(hotspot['yPosition']), parseInt(hotspot['zPosition']*210));
         makeHotspot(position, hotspot['IdHotspot']);
     }
 }
@@ -48,13 +48,13 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 
         //determina la dimensione del box nero
         //ATTENZIONE!!! la dimensione del box nero non viene modificata insieme alla dimensione del contenuto!
-        var xDimension = 400;
-        var yDimension = 200;
+        var xDimension = 500;
+        var yDimension = 300;
         var planeGeometry = new THREE.PlaneBufferGeometry(xDimension, yDimension);
         //larghezza del semicerchio nella cornice
-        var inside = 27; //15
+        var inside = 42; //15
         //altezza del semicerchio nella cornice
-        var radius = 60;
+        var radius = 80;
         //larghezza della cornice attaccata alla sfera, deve essere più larga perché ha l'incavatura
         var corniceLarga = 50; //25
         //larghezza degli altri lati della cornice
@@ -106,7 +106,7 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 
         planeMesh.url = html;
 
-        var distance = (xDimension / 2) + 12;
+        var distance = (xDimension / 2) - 5;
 
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
         if (leftOrRight === "left") {
@@ -362,8 +362,8 @@ function manageHotspot() {
 function makeHotspot(position, id) {
     var pts = [];
     var detail = 1;
-    var radius = 25;
-    var radius2 = 12.5;
+    var radius = 20;
+    var radius2 = 10.5;
 
     hotspotArray = getContent("hotspotInfo", id);
     var sourceArray = new Array();
@@ -387,7 +387,7 @@ function makeHotspot(position, id) {
     for (var i = 0; i <= radius2; i += detail)
         pts.push(new THREE.Vector3(radius - (radius2 / 2), 0, (radius2 / 2) - i));
 
-    var torusGeometry = new THREE.LatheGeometry(pts, 12, 0, Math.PI * 170 / 360);
+    var torusGeometry = new THREE.LatheGeometry(pts, 12, 0, Math.PI * 180 / 360);
 
 
     if (sourceArray['Panorama'] !== null) {
@@ -408,9 +408,13 @@ function makeHotspot(position, id) {
     var torusMaterial = new THREE.MeshFaceMaterial(materials1);
     var torus1 = new THREE.Mesh(torusGeometry, torusMaterial);
     torus1.position.set(position.x, position.y, position.z);
+
     torus1.lookAt(new THREE.Vector3(0, 0, 0));
-    torus1.rotation.z = torus1.rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
+
+    torus1.rotation.z = torus1.rotation.z - Math.PI / 4 + Math.PI * 5 / 360;;
     torus1.initialRotation = torus1.rotation.z;
+    torus1.translateX(1);
+    torus1.translateY(1);
     torus1.name = "Panorama";
     torus1.type = "Hotspot";
     torus1.hotspotId = id;
@@ -434,9 +438,13 @@ function makeHotspot(position, id) {
     var torusMaterial = new THREE.MeshFaceMaterial(materials2);
     var torus2 = new THREE.Mesh(torusGeometry, torusMaterial);
     torus2.position.set(position.x, position.y, position.z);
+
     torus2.lookAt(new THREE.Vector3(0, 0, 0));
+
     torus2.rotation.z = torus2.rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
     torus2.initialRotation = torus2.rotation.z;
+    torus2.translateX(1);
+    torus2.translateY(1);
     torus2.name = "Gallery";
     torus2.type = "Hotspot";
     torus2.hotspotId = id;
@@ -463,6 +471,8 @@ function makeHotspot(position, id) {
     torus3.lookAt(new THREE.Vector3(0, 0, 0));
     torus3.rotation.z = torus3.rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
     torus3.initialRotation = torus3.rotation.z;
+    torus3.translateX(1);
+    torus3.translateY(1);
     torus3.name = "PDF";
     torus3.type = "Hotspot";
     torus3.hotspotId = id;
@@ -489,6 +499,8 @@ function makeHotspot(position, id) {
     torus4.lookAt(new THREE.Vector3(0, 0, 0));
     torus4.rotation.z = torus4.rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
     torus4.initialRotation = torus4.rotation.z;
+    torus4.translateX(1);
+    torus4.translateY(1);
     torus4.name = "Object";
     torus4.type = "Hotspot";
     torus4.hotspotId = id;
@@ -497,13 +509,13 @@ function makeHotspot(position, id) {
 //Crea il centro dell'hotspot, quello con quattro frecce.
     var arrowPts = [];
 
-    var m = 1.6;
+    var m = 0.6;
 //lunghezza del corpo della freccia
-    var l = m + 7;
+    var l = m + 4;
 //larghezza della freccia
-    var f = m + 4;
+    var f = m + 2.5;
 //lunghezza totale della freccia
-    var p = m + l + 4;
+    var p = m + l + 3;
 //colore della freccia;
     arrowColor = 0xeeeeee;
 //i quattro blocchi seguenti sono le quattro frecce
@@ -562,7 +574,7 @@ function dragHotspot(hotspotId, position) {
 
     var dir = vector.sub( camera.position ).normalize();
 
-    var distance = 180;
+    var distance = 210;
 
     var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
     pos.y = 0;
