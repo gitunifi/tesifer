@@ -5,12 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link href="css/index.css" rel="stylesheet" type="text/css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
 
 
 <div id="container">
 </div>
+<div class="zoom_container"><a id="zoomIn"><i class="fa fa-search-plus"></i></a> <a id="zoomOut"><i class="fa fa-search-minus"></i></a></div>
 <div id="info">MICC - Media Integration and Communication Center
 
     <script type="text/javascript" src="jslibraries/three.min.js"></script>
@@ -18,6 +20,16 @@
     <script type="text/javascript" src="js/ajax.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
     <script>
+        $(function () {
+            $("#zoomIn").click(function(e) {
+                e.preventDefault();
+                zoomIn();
+            });
+            $("#zoomOut").click(function(e) {
+                e.preventDefault();
+                zoomOut();
+            });
+        });
         //arrow helper?
         var camera, scene, renderer, mesh, planeMesh, element;
         var textures = [];

@@ -54,7 +54,7 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         //larghezza del semicerchio nella cornice
         var inside = 42; //15
         //altezza del semicerchio nella cornice
-        var radius = 80;
+        var radius = 70;
         //larghezza della cornice attaccata alla sfera, deve essere più larga perché ha l'incavatura
         var corniceLarga = 50; //25
         //larghezza degli altri lati della cornice
@@ -106,7 +106,7 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 
         planeMesh.url = html;
 
-        var distance = (xDimension / 2) - 5;
+        var distance = (xDimension / 2) - 20;
 
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
         if (leftOrRight === "left") {
@@ -153,7 +153,7 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
          0.5 viene incluso la metà del contenuto;
          */
 
-        cssObject.position.set(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
+        cssObject.position.set(planeMesh.position.x, planeMesh.position.y+2, planeMesh.position.z);
         cssObject.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
 
 
@@ -317,7 +317,7 @@ function manageHotspot() {
 
                 rightPosition = true;
                 var hotspotInfo = search("Panorama");
-                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", 0x00acec, 1, "Panorama");
+                portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "right", /*0x00acec*/ 0x1AA4D3, 1, "Panorama");
                 selectedFrame = interactiveObject;
                 //indentLeft(indent);
             }
@@ -387,7 +387,7 @@ function makeHotspot(position, id) {
     for (var i = 0; i <= radius2; i += detail)
         pts.push(new THREE.Vector3(radius - (radius2 / 2), 0, (radius2 / 2) - i));
 
-    var torusGeometry = new THREE.LatheGeometry(pts, 12, 0, Math.PI * 180 / 360);
+    var torusGeometry = new THREE.LatheGeometry(pts, 20, 0, Math.PI * 165 / 360);
 
 
     if (sourceArray['Panorama'] !== null) {
@@ -413,8 +413,6 @@ function makeHotspot(position, id) {
 
     torus1.rotation.z = torus1.rotation.z - Math.PI / 4 + Math.PI * 5 / 360;;
     torus1.initialRotation = torus1.rotation.z;
-    torus1.translateX(1);
-    torus1.translateY(1);
     torus1.name = "Panorama";
     torus1.type = "Hotspot";
     torus1.hotspotId = id;
@@ -443,8 +441,6 @@ function makeHotspot(position, id) {
 
     torus2.rotation.z = torus2.rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
     torus2.initialRotation = torus2.rotation.z;
-    torus2.translateX(1);
-    torus2.translateY(1);
     torus2.name = "Gallery";
     torus2.type = "Hotspot";
     torus2.hotspotId = id;
@@ -471,8 +467,6 @@ function makeHotspot(position, id) {
     torus3.lookAt(new THREE.Vector3(0, 0, 0));
     torus3.rotation.z = torus3.rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
     torus3.initialRotation = torus3.rotation.z;
-    torus3.translateX(1);
-    torus3.translateY(1);
     torus3.name = "PDF";
     torus3.type = "Hotspot";
     torus3.hotspotId = id;
@@ -499,8 +493,6 @@ function makeHotspot(position, id) {
     torus4.lookAt(new THREE.Vector3(0, 0, 0));
     torus4.rotation.z = torus4.rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
     torus4.initialRotation = torus4.rotation.z;
-    torus4.translateX(1);
-    torus4.translateY(1);
     torus4.name = "Object";
     torus4.type = "Hotspot";
     torus4.hotspotId = id;
@@ -558,6 +550,54 @@ function makeHotspot(position, id) {
     arrow.hotspotId = id;
     arrow.position.set(position.x, position.y, position.z);
     arrow.lookAt(new THREE.Vector3(0, 0, 0));
+
+
+    var material = new THREE.MeshBasicMaterial({
+        color: 0xff0000
+    });
+
+    var radius = 7;
+    var segments = 32;
+
+    var circleGeometry = new THREE.CircleGeometry( radius, segments );
+    var circle = new THREE.Mesh( circleGeometry, material );
+    circle.position.set(position.x, position.y, position.z);
+    circle.lookAt(new THREE.Vector3(0, 0, 0));
+    circle.translateZ(-40);
+    circle.name = "Circle";
+    circle.hotspotId = id;
+    scene.add( circle );
+    markers.push(circle);
+
+    var material2 = new THREE.MeshBasicMaterial({
+        color: 0x000000
+    });
+
+    var radius2 = 8;
+    var segments2 = 32;
+
+    var circleGeometry2 = new THREE.CircleGeometry( radius2, segments2 );
+    var circle2 = new THREE.Mesh( circleGeometry2, material2 );
+    circle2.position.set(position.x, position.y, position.z);
+    circle2.lookAt(new THREE.Vector3(0, 0, 0));
+    circle2.translateZ(-50);
+    circle2.name = "Circle2";
+    circle2.hotspotId = id;
+    scene.add( circle2 );
+    markers.push(circle2);
+
+    var lineMaterial = new THREE.LineDashedMaterial({ color: 0xff0000, dashSize: 2, gapSize: 1});
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(new THREE.Vector3(circle.position.x, circle.position.y, circle.position.z));
+    geometry.vertices.push(new THREE.Vector3(position.x, position.y, position.z));
+    geometry.computeLineDistances();
+    var line = new THREE.Line(geometry, lineMaterial, THREE.LineStrip);
+    line.name = "Line";
+    line.hotspotId = id;
+    scene.add(line);
+    markers.push(line);
+
+
     //arrow.rotation.y = angolo;
     //arrow.rotation.y = arrow.rotation.y + Math.PI / 2 + Math.atan(parseFloat(arrow.position.z) / parseFloat(arrow.position.x)); //FIXME
 }
@@ -585,16 +625,21 @@ function dragHotspot(hotspotId, position) {
 
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].hotspotId === hotspotId) {
-            markers[i].position.set(pos.x, pos.y, pos.z);
-            markers[i].lookAt(new THREE.Vector3(0, 0, 0));
-            if (markers[i].name == "Object") {
-                markers[i].rotation.z = markers[i].rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
-            } else if (markers[i].name == "PDF") {
-                markers[i].rotation.z = markers[i].rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
-            } else if (markers[i].name == "Gallery") {
-                markers[i].rotation.z = markers[i].rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
-            } else if (markers[i].name == "Panorama") {
-                markers[i].rotation.z = markers[i].rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
+            if (markers[i].name != "Circle" && markers[i].name != "Circle2" && markers[i].name != "Line") {
+                markers[i].position.set(pos.x, pos.y, pos.z);
+                markers[i].lookAt(new THREE.Vector3(0, 0, 0));
+                if (markers[i].name == "Object") {
+                    markers[i].rotation.z = markers[i].rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
+                } else if (markers[i].name == "PDF") {
+                    markers[i].rotation.z = markers[i].rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
+                } else if (markers[i].name == "Gallery") {
+                    markers[i].rotation.z = markers[i].rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
+                } else if (markers[i].name == "Panorama") {
+                    markers[i].rotation.z = markers[i].rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
+                }
+            } else if (markers[i].name == "Line") {
+                markers[i].geometry.vertices[1].set(pos.x, pos.y, pos.z);
+                markers[i].geometry.verticesNeedUpdate = true;
             }
         }
     }
@@ -660,5 +705,5 @@ function makeBordoPannello(width, height, radius, inside, corniceLarga, cornice,
     extrudeSettings.bevelSegments = 2;
     extrudeSettings.steps = 2;
     var geometry = new THREE.ExtrudeGeometry(californiaShape, extrudeSettings);
-    return new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: color, opacity: 0.80, transparent: true}));
+    return new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: color, opacity: 0.7, transparent: true}));
 }

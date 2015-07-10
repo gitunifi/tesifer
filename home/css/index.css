@@ -97,6 +97,27 @@ body {
     z-index: 2000;
 }
 
+.zoom_container .fa {
+    color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+    cursor: pointer;
+    outline: 0;
+}
+
+.zoom_container {
+    z-index: 2000;
+    opacity: 0.7;
+    font-size: 20px;
+    padding: 4px 10px;
+    background-color: #38342B;
+    width: auto;
+    color: white;
+    position: absolute;
+    top: 30px;
+    right: 10px;
+}
+
 .copyright {
     font-family: Monospace;
     font-size: 13px;
