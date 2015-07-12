@@ -362,8 +362,8 @@ function manageHotspot() {
 function makeHotspot(position, id) {
     var pts = [];
     var detail = 1;
-    var radius = 20;
-    var radius2 = 10.5;
+    var radius = 24;
+    var radius2 = 14;
 
     hotspotArray = getContent("hotspotInfo", id);
     var sourceArray = new Array();
@@ -387,7 +387,29 @@ function makeHotspot(position, id) {
     for (var i = 0; i <= radius2; i += detail)
         pts.push(new THREE.Vector3(radius - (radius2 / 2), 0, (radius2 / 2) - i));
 
-    var torusGeometry = new THREE.LatheGeometry(pts, 20, 0, Math.PI * 165 / 360);
+    var torusGeometry = new THREE.LatheGeometry(pts, 12, 0, Math.PI * 165 / 360);
+
+    /*var arcShape = new THREE.Shape();
+    arcShape.moveTo( 0, 0 );
+    arcShape.arc( 0, 0, radius, 0, Math.PI * 170 / 360, true );
+
+    var holePath = new THREE.Path();
+    holePath.moveTo( 0, 0 );
+    holePath.arc( 0, 0, radius2, 0, Math.PI * 170 / 360, true );
+    arcShape.holes.push( holePath );
+
+    var extrudeSettings = {
+        amount : 2,
+        steps: 100,
+        bevelThickness: 0,
+        bevelSize: 0
+    };
+
+    var torusGeometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);*/
+
+    var light = new THREE.PointLight( 0x555555, 5, radius*2 );
+    light.position.set( position.x, position.y, position.z );
+    scene.add( light );
 
 
     if (sourceArray['Panorama'] !== null) {
@@ -411,7 +433,7 @@ function makeHotspot(position, id) {
 
     torus1.lookAt(new THREE.Vector3(0, 0, 0));
 
-    torus1.rotation.z = torus1.rotation.z - Math.PI / 4 + Math.PI * 5 / 360;;
+    torus1.rotation.z = torus1.rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
     torus1.initialRotation = torus1.rotation.z;
     torus1.name = "Panorama";
     torus1.type = "Hotspot";
@@ -596,6 +618,11 @@ function makeHotspot(position, id) {
     line.hotspotId = id;
     scene.add(line);
     markers.push(line);
+
+
+
+
+
 
 
     //arrow.rotation.y = angolo;
