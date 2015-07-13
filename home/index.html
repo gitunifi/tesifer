@@ -4,9 +4,9 @@
     <title>three.js webgl - Spherical Panorama</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
     <link href="css/index.css" rel="stylesheet" type="text/css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="font-awesome-4.3.0/css/font-awesome.min.css" rel="stylesheet">
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ZOOm3ssYsWpjsDlm9V78vWXD9pVd2ro">
     </script>
@@ -56,13 +56,12 @@
         document.getElementById('imgLoader').style.display = "none";
     </script>
 </div>
-<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+<script src="jslibraries/jquery-ui.js"></script>
 <script src="jslibraries/three.min.js"></script>
 <script src="js/ajax.js"></script>
 <script src="jslibraries/helvetiker_regular.typeface.js"></script>
 <script src="jslibraries/CSS3DRenderer.js"></script>
 <script src="js/main.js"></script>
-<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
 <script src="js/hotspot.js"></script>
     <script>
         var camera, scene, renderer, mesh, cssScene, rendererCSS, planeMesh, element, cssObject;
@@ -148,6 +147,7 @@
             camera.position.set(0, 0, 0);
             camera.target = new THREE.Vector3(200, 0, 0);
             scene = new THREE.Scene();
+            cssScene = new THREE.Scene();
             var panoName = getContent("panorama", panoId).pop()['Panorama'];
             getHotspot();
             var texture = THREE.ImageUtils.loadTexture('textures/' + panoName);
@@ -193,7 +193,7 @@
             setTimeout(function () {
                 preload(panoId);
             }, 2000);
-            cssScene = new THREE.Scene();
+
             element = document.createElement('iframe');
             element.frameBorder = "0";
             elementExternaLink = document.createElement('a');

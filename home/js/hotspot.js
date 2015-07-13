@@ -416,21 +416,23 @@ function makeHotspot(position, id) {
 
 
     if (sourceArray['Panorama'] !== null) {
-        var materials1 = [
-            new THREE.MeshLambertMaterial({
+        var materials1 =
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/pano_icon_vertical.png')
-            })
-        ];
+            });
+
     }
     else {
         var materials1 = [
-            new THREE.MeshLambertMaterial({
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/NoPanorama.png')
             })
         ];
     }
 
-    var torusMaterial = new THREE.MeshFaceMaterial(materials1);
+
+
+    var torusMaterial = materials1;//new THREE.MeshFaceMaterial(materials1);
     var torus1 = new THREE.Mesh(torusGeometry, torusMaterial);
     torus1.position.set(position.x, position.y, position.z);
 
@@ -446,14 +448,14 @@ function makeHotspot(position, id) {
 
     if (sourceArray['Gallery'] !== null) {
         var materials2 = [
-            new THREE.MeshLambertMaterial({
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/gallery_icon_horizontal.png')
             })
         ];
     }
     else {
         var materials2 = [
-            new THREE.MeshLambertMaterial({
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/NoGallery.png')
             })
         ];
@@ -474,14 +476,14 @@ function makeHotspot(position, id) {
 
     if (sourceArray['PDF'] !== null) {
         var materials3 = [
-            new THREE.MeshLambertMaterial({
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/pdf_icon_horizontal_reflected.png')
             })
         ];
     }
     else {
         var materials3 = [
-            new THREE.MeshLambertMaterial({
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/NoPDF.png')
             })
         ];
@@ -500,14 +502,14 @@ function makeHotspot(position, id) {
 
     if (sourceArray['Object'] !== null) {
         var materials4 = [
-            new THREE.MeshLambertMaterial({
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/3d_icon_horizontal.png')
             })
         ];
     }
     else {
         var materials4 = [
-            new THREE.MeshLambertMaterial({
+            new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/NoObject.png')
             })
         ];
