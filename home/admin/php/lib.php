@@ -395,7 +395,7 @@ class Panorama
     public function getPanoramaHotspots($panorama)
     {
         return Db::fetchAll(sprintf("
-            SELECT h.id, h.subject, p.xPosition x, p.yPosition y, p.zPosition z, p.angolo
+            SELECT h.id, h.subject, p.xPosition x, p.yPosition y, p.zPosition z
             FROM HotspotNelPanorama p, Hotspot h
             WHERE p.idhotspot = h.id and p.idpanorama = '%d'
             ORDER BY h.id
@@ -415,8 +415,8 @@ class Panorama
 
         if (isset($exists[0])) {
             Db::update(sprintf("
-                UPDATE HotspotNelPanorama set xPosition = '%s', yPosition = '%s', zPosition = '%s', angolo = '%s' where idpanorama = '%d' and idhotspot = '%d';
-            ", cos(deg2rad($left)), 0, sin(deg2rad($left)), $left, $panorama, $hotspot));
+                UPDATE HotspotNelPanorama set xPosition = '%s', yPosition = '%s', zPosition = '%s' where idpanorama = '%d' and idhotspot = '%d';
+            ", cos(deg2rad($left)), 0, sin(deg2rad($left)), $panorama, $hotspot));
         } else {
             Db::insert(sprintf("
                 INSERT INTO HotspotNelPanorama VALUES ('%d', '%d', '%s', '%s', '%s', '%s');

@@ -124,7 +124,7 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 
 
 
-        //inseimento del contenintore nero
+        //inseimento del contenitore nero
         objects.push(planeMesh);
         scene.add(planeMesh);
 
