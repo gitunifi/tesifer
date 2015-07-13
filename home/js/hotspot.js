@@ -106,7 +106,7 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 
         planeMesh.url = html;
 
-        var distance = (xDimension / 2) - 20;
+        var distance = (xDimension / 2) - 7;
 
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
         if (leftOrRight === "left") {
@@ -361,7 +361,7 @@ function manageHotspot() {
 
 function makeHotspot(position, id) {
     var pts = [];
-    var detail = 1;
+    var detail = 0.5;
     var radius = 24;
     var radius2 = 14;
 
@@ -409,7 +409,10 @@ function makeHotspot(position, id) {
 
     var light = new THREE.PointLight( 0x555555, 5, radius*2 );
     light.position.set( position.x, position.y, position.z );
-    scene.add( light );
+    light.name = "Light"
+    light.hotspotId = id;
+    markers.push(light);
+    scene.add(light);
 
 
     if (sourceArray['Panorama'] !== null) {
@@ -588,6 +591,7 @@ function makeHotspot(position, id) {
     circle.translateZ(-40);
     circle.name = "Circle";
     circle.hotspotId = id;
+    circle.visible = false;
     scene.add( circle );
     markers.push(circle);
 
@@ -605,6 +609,7 @@ function makeHotspot(position, id) {
     circle2.translateZ(-50);
     circle2.name = "Circle2";
     circle2.hotspotId = id;
+    circle2.visible = false;
     scene.add( circle2 );
     markers.push(circle2);
 
@@ -616,6 +621,7 @@ function makeHotspot(position, id) {
     var line = new THREE.Line(geometry, lineMaterial, THREE.LineStrip);
     line.name = "Line";
     line.hotspotId = id;
+    line.visible = false;
     scene.add(line);
     markers.push(line);
 
@@ -650,23 +656,47 @@ function dragHotspot(hotspotId, position) {
     restoreHotspotRotation();
     selectedFrame = undefined;
 
+    var diffX = 0;
+    var diffZ = 0;
+
+    for (var i = 0; i < markers.length; i++) {
+        if (markers[i].hotspotId === hotspotId && markers[i].name == "Line") {
+            diffX = Math.abs(pos.x - markers[i].geometry.vertices[0].x);
+            diffZ = Math.abs(pos.z - markers[i].geometry.vertices[0].z);
+        }
+    }
+
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].hotspotId === hotspotId) {
             if (markers[i].name != "Circle" && markers[i].name != "Circle2" && markers[i].name != "Line") {
                 markers[i].position.set(pos.x, pos.y, pos.z);
-                markers[i].lookAt(new THREE.Vector3(0, 0, 0));
-                if (markers[i].name == "Object") {
-                    markers[i].rotation.z = markers[i].rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
-                } else if (markers[i].name == "PDF") {
-                    markers[i].rotation.z = markers[i].rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
-                } else if (markers[i].name == "Gallery") {
-                    markers[i].rotation.z = markers[i].rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
-                } else if (markers[i].name == "Panorama") {
-                    markers[i].rotation.z = markers[i].rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
+
+                if (markers[i].name != "Light") {
+                    markers[i].lookAt(new THREE.Vector3(0, 0, 0));
+                    if (markers[i].name == "Object") {
+                        markers[i].rotation.z = markers[i].rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
+                    } else if (markers[i].name == "PDF") {
+                        markers[i].rotation.z = markers[i].rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
+                    } else if (markers[i].name == "Gallery") {
+                        markers[i].rotation.z = markers[i].rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
+                    } else if (markers[i].name == "Panorama") {
+                        markers[i].rotation.z = markers[i].rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
+                    }
                 }
             } else if (markers[i].name == "Line") {
+                if (diffX > 50 || diffZ > 50) {
+                    markers[i].visible = true;
+                } else {
+                    markers[i].visible = false;
+                }
                 markers[i].geometry.vertices[1].set(pos.x, pos.y, pos.z);
                 markers[i].geometry.verticesNeedUpdate = true;
+            } else if (markers[i].name == "Circle" || markers[i].name == "Circle2") {
+                if (diffX > 50 || diffZ > 50) {
+                    markers[i].visible = true;
+                } else {
+                    markers[i].visible = false;
+                }
             }
         }
     }
