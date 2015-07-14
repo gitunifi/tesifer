@@ -11,7 +11,8 @@ function getHotspot() {
     for (var i = 0; i < hotspotArray.length; i++) {
         var hotspot = hotspotArray[i];
         var position = new THREE.Vector3(parseInt(hotspot['xPosition']*210), parseInt(hotspot['yPosition']), parseInt(hotspot['zPosition']*210));
-        makeHotspot(position, hotspot['IdHotspot']);
+        var finalPosition = new THREE.Vector3(parseInt(hotspot['xPositionFinal']*210), parseInt(hotspot['yPositionFinal']), parseInt(hotspot['zPositionFinal']*210));
+        makeHotspot(finalPosition, hotspot['IdHotspot'], position);
     }
 }
 
@@ -66,36 +67,6 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
         planeMesh.position.set(hotspotPosition.x, hotspotPosition.y, hotspotPosition.z);
 
-        //var hotspotExternalMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 1});
-        var image;
-        if (type == "Panorama") {
-            image = [
-                new THREE.MeshLambertMaterial({
-                    map: THREE.ImageUtils.loadTexture('images/pano_icon_vertical.png')
-                })
-            ];
-        } else if (type == "Gallery") {
-            image = [
-                new THREE.MeshLambertMaterial({
-                    map: THREE.ImageUtils.loadTexture('images/gallery_icon_horizontal.png')
-                })
-            ];
-        } else if (type == "PDF") {
-            image = [
-                new THREE.MeshLambertMaterial({
-                    map: THREE.ImageUtils.loadTexture('images/pdf_icon_horizontal_reflected.png')
-                })
-            ];
-        } else if (type == "Object") {
-            image = [
-                new THREE.MeshLambertMaterial({
-                    map: THREE.ImageUtils.loadTexture('images/3d_icon_horizontal.png')
-                })
-            ];
-        }
-        //var hotspotExternalMaterial = new THREE.MeshFaceMaterial(image);
-        //var hotspotExternalGeometry = new THREE.PlaneBufferGeometry(60, 20);
-        //hotspotExternalMesh = new THREE.Mesh(hotspotExternalGeometry, hotspotExternalMaterial);
 
         elementExternaLink.href = html;
         elementExternaLink.target = "_blank";
@@ -359,7 +330,7 @@ function manageHotspot() {
     }
 }
 
-function makeHotspot(position, id) {
+function makeHotspot(position, id, initialPosition) {
     var pts = [];
     var detail = 0.5;
     var radius = 24;
@@ -583,17 +554,20 @@ function makeHotspot(position, id) {
         color: 0xff0000
     });
 
-    var radius = 7;
+    var dist = distance(position, initialPosition);
+
+    var radius = 10;
     var segments = 32;
 
     var circleGeometry = new THREE.CircleGeometry( radius, segments );
     var circle = new THREE.Mesh( circleGeometry, material );
-    circle.position.set(position.x, position.y, position.z);
+    circle.position.set(initialPosition.x, initialPosition.y, initialPosition.z);
     circle.lookAt(new THREE.Vector3(0, 0, 0));
-    circle.translateZ(-40);
+    circle.translateZ(-220);
     circle.name = "Circle";
     circle.hotspotId = id;
-    circle.visible = false;
+    if (dist == 0)
+        circle.visible = false;
     scene.add( circle );
     markers.push(circle);
 
@@ -601,21 +575,22 @@ function makeHotspot(position, id) {
         color: 0x000000
     });
 
-    var radius2 = 8;
+    var radius2 = 12;
     var segments2 = 32;
 
     var circleGeometry2 = new THREE.CircleGeometry( radius2, segments2 );
     var circle2 = new THREE.Mesh( circleGeometry2, material2 );
-    circle2.position.set(position.x, position.y, position.z);
+    circle2.position.set(initialPosition.x, initialPosition.y, initialPosition.z);
     circle2.lookAt(new THREE.Vector3(0, 0, 0));
-    circle2.translateZ(-50);
+    circle2.translateZ(-240);
     circle2.name = "Circle2";
     circle2.hotspotId = id;
-    circle2.visible = false;
+    if (dist == 0)
+        circle2.visible = false;
     scene.add( circle2 );
     markers.push(circle2);
 
-    var lineMaterial = new THREE.LineDashedMaterial({ color: 0xff0000, dashSize: 2, gapSize: 1});
+    var lineMaterial = new THREE.LineDashedMaterial({ color: 0xff0000, dashSize: 8, gapSize: 8});
     var geometry = new THREE.Geometry();
     geometry.vertices.push(new THREE.Vector3(circle.position.x, circle.position.y, circle.position.z));
     geometry.vertices.push(new THREE.Vector3(position.x, position.y, position.z));
@@ -623,7 +598,8 @@ function makeHotspot(position, id) {
     var line = new THREE.Line(geometry, lineMaterial, THREE.LineStrip);
     line.name = "Line";
     line.hotspotId = id;
-    line.visible = false;
+    if (dist == 0)
+        line.visible = false;
     scene.add(line);
     markers.push(line);
 
@@ -635,6 +611,20 @@ function makeHotspot(position, id) {
 
     //arrow.rotation.y = angolo;
     //arrow.rotation.y = arrow.rotation.y + Math.PI / 2 + Math.atan(parseFloat(arrow.position.z) / parseFloat(arrow.position.x)); //FIXME
+}
+
+function endDragHotspot(hotspotId, position) {
+    for (var i = 0; i < markers.length; i++) {
+        if (markers[i].hotspotId === hotspotId && markers[i].name == "Line") {
+            $.ajax({
+                url: "admin/php/?controller=Panorama;updatePanoramaHotspotXYZ;" + panoId + "," + hotspotId + "," + markers[i].geometry.vertices[1].x/210 + "," + markers[i].geometry.vertices[1].y/210 + "," + markers[i].geometry.vertices[1].z/210,
+                dataType: "json",
+                context: this
+            }).done(function(response) {
+            });
+        }
+    }
+
 }
 
 function dragHotspot(hotspotId, position) {
@@ -652,7 +642,7 @@ function dragHotspot(hotspotId, position) {
     var distance = 210;
 
     var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-    pos.y = 0;
+    //pos.y = 0;
 
     cleanUpHotSpotContent();
     restoreHotspotRotation();
@@ -689,7 +679,7 @@ function dragHotspot(hotspotId, position) {
                 if (diffX > 50 || diffZ > 50) {
                     markers[i].visible = true;
                 } else {
-                    markers[i].visible = false;
+                    markers[i].visible = true;
                 }
                 markers[i].geometry.vertices[1].set(pos.x, pos.y, pos.z);
                 markers[i].geometry.verticesNeedUpdate = true;
@@ -697,7 +687,7 @@ function dragHotspot(hotspotId, position) {
                 if (diffX > 50 || diffZ > 50) {
                     markers[i].visible = true;
                 } else {
-                    markers[i].visible = false;
+                    markers[i].visible = true;
                 }
             }
         }
@@ -765,4 +755,13 @@ function makeBordoPannello(width, height, radius, inside, corniceLarga, cornice,
     extrudeSettings.steps = 2;
     var geometry = new THREE.ExtrudeGeometry(californiaShape, extrudeSettings);
     return new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: color, opacity: 0.7, transparent: true}));
+}
+
+function distance (v1, v2)
+{
+    var dx = v1.x - v2.x;
+    var dy = v1.y - v2.y;
+    var dz = v1.z - v2.z;
+
+    return Math.sqrt(dx*dx+dy*dy+dz*dz);
 }

@@ -30,7 +30,6 @@
             position: absolute;
             top: 0px;
             width: 100%;
-            height: 100%;
             color: #ffffff;
             padding: 5px;
             font-family:Monospace;
@@ -40,11 +39,12 @@
         }
     </style>
 </head>
-<body>
+<body style="margin: 0; padding: 0;">
 
 <div id="info" align="center"><b>MICC - Media Integration and Communication Center</b></div>
 <div class="zoom_container"><a id="zoomIn"><i class="fa fa-search-plus"></i></a> <a id="zoomOut"><i class="fa fa-search-minus"></i></a></div>
 <script type="text/javascript" src="jslibraries/three.min.js"></script>
+<script type="text/javascript" src="jslibraries/OrbitControls.js"></script>
 <script type="text/javascript" src="jslibraries/DDSLoader.js"></script>
 <script type="text/javascript" src="jslibraries/MTLLoader.js"></script>
 <script type="text/javascript" src="jslibraries/OBJMTLLoader.js"></script>
@@ -102,11 +102,12 @@
         camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
         camera.position.z = 20;
 
+
         // scene
 
         scene = new THREE.Scene();
 
-        var ambient = new THREE.AmbientLight( 0x444444 );
+        var ambient = new THREE.AmbientLight( 0xaaaaaa );
         scene.add( ambient );
 
         var directionalLight = new THREE.DirectionalLight( 0xffeedd );
@@ -118,7 +119,6 @@
         var onProgress = function ( xhr ) {
             if ( xhr.lengthComputable ) {
                 var percentComplete = xhr.loaded / xhr.total * 100;
-                console.log( Math.round(percentComplete, 2) + '% downloaded' );
             }
         };
 
@@ -136,21 +136,24 @@
 
         }, onProgress, onError );
 
-        //
 
         renderer = new THREE.WebGLRenderer();
         renderer.setClearColor( 0x1E628B, 1);
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild( renderer.domElement );
-        document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-        document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-        document.addEventListener( 'mousemove', onDocumentMouseMove, false );
         document.addEventListener('mousewheel', onDocumentMouseWheel, false);
 
-        //
 
         window.addEventListener( 'resize', onWindowResize, false );
+
+        controls = new THREE.OrbitControls( camera );
+        controls.minDistance = 10;
+        controls.maxDistance = 20;
+
+
+        animate();
+
 
     }
 
@@ -166,29 +169,10 @@
 
     }
 
-    function onDocumentMouseDown( event ) {
-
-        isMouseDown = true;
-        onPointerDownPointerX = event.clientX;
-        onPointerDownPointerY = event.clientY;
-
-    }
-
-    function onDocumentMouseUp( event ) {
-
-        isMouseDown = false;
-
-    }
-
-    function onDocumentMouseMove( event ) {
-        if (isMouseDown) {
-            mouseX = ( event.clientX - onPointerDownPointerX ) / 4;
-            mouseY = ( event.clientY - onPointerDownPointerY ) / 4;
-        }
-    }
 
     function onDocumentMouseWheel( event ) {
         event.preventDefault();
+        event.stopPropagation();
     }
 
     //
@@ -196,16 +180,12 @@
     function animate() {
 
         requestAnimationFrame( animate );
+        controls.update();
         render();
 
     }
 
     function render() {
-
-        camera.position.x = ( -mouseX - camera.position.x ) * 0.25;
-        camera.position.y = ( + mouseY - camera.position.y ) * 0.25;
-
-        camera.lookAt( scene.position );
 
         renderer.render( scene, camera );
 
@@ -228,92 +208,6 @@
             camera.projectionMatrix.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
         }
     }
-
-    //arrow helper?
-    /*var camera, scene, renderer, mesh;
-    var objects = [];
-    var loader = new THREE.OBJMTLLoader();
-    var fov = 70,
-        plane,
-        isUserInteracting = false,
-        onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-        lon = 0, onMouseDownLon = 0,
-        lat = 0, onMouseDownLat = 0,
-        phi = 0, theta = 0,
-        latLimit = -30,
-        projector,
-        minZoom = 100, maxZoom = 20,
-        interactiveObject,
-        onMouseDownObjectXRotation,
-        onMouseDownObjectYRotation,
-        onMouseDownObjectZRotation,
-        isRightClick = false;
-    init();
-    animate();
-    function init() {
-        loader.addEventListener('load', function (event) {
-            var object = event.content;
-            object.position.x = 20;
-            object.position.y = 0;
-            object.position.z = 0;
-            object.rotation.y = -Math.PI / 2;
-            var geometry = object.children[0].geometry;
-            THREE.GeometryUtils.center(geometry);
-            scene.add(object);
-            objects.push(object);
-        }, false);
-        camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1100);
-        camera.target = new THREE.Vector3(0, 0, 0);
-        scene = new THREE.Scene();
-
-        var geometry = new THREE.PlaneGeometry(200, 200);
-        geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
-        var material = new THREE.MeshBasicMaterial({color: 0xe0e0e0});
-        plane = new THREE.Mesh(geometry, material);
-        plane.position.set(17, 0, 0);
-        plane.lookAt(new THREE.Vector3(0, 0, 0));
-        scene.add(plane);
-
-        var splitArray = window.location.search.split("=");
-        var objectId = splitArray[1];
-        var object = getContent("object", objectId);
-        loader.load('objects/' + object);
-
-        renderer = new THREE.WebGLRenderer({antialias: true});
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
-        //shadow
-        var light = new THREE.DirectionalLight(0xffffff);
-        light.position.set(0, 0, 0);
-        light.target.position.set(10, 0, 0);
-        scene.add(light);
-
-        var light1 = new THREE.DirectionalLight(0xffffff);
-        light1.position.set(2, 0, 0);
-        light1.target.position.set(10, 0, 0);
-        scene.add(light1);
-
-        var light2 = new THREE.DirectionalLight(0xffffff);
-        light2.position.set(-2, 0, 0);
-        light2.target.position.set(10, 0, 0);
-        scene.add(light2);
-        scene.add(light);
-        //renderer.shadowMapEnabled = true;
-        light.castShadow = true;
-        light.shadowDarkness = 1;
-        renderer.shadowMapSoft = true;
-        plane.receiveShadow = true;
-        //
-
-        document.addEventListener('mousedown', onDocumentMouseDown, false);
-        document.addEventListener('mousemove', onDocumentMouseMove, false);
-        document.addEventListener('mouseup', onDocumentMouseUp, false);
-        document.addEventListener('mousewheel', onDocumentMouseWheel, false);
-        document.addEventListener('DOMMouseScroll', onDocumentMouseWheel, false);
-        window.addEventListener('resize', onWindowResize, false);
-
-
-    }*/
 
 
 </script>

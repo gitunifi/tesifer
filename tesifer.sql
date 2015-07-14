@@ -174,8 +174,8 @@ CREATE TABLE IF NOT EXISTS `HotspotNelPanorama` (
 --
 
 INSERT INTO `HotspotNelPanorama` (`IdPanorama`, `IdHotspot`, `xPosition`, `yPosition`, `zPosition`) VALUES
-(11, 1, -3, 0, 210),
-(12, 2, 3, 0, 210);
+(11, 1, 0, 0, 1),
+(12, 2, 0, 0, 1);
 
 -- --------------------------------------------------------
 

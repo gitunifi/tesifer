@@ -129,7 +129,7 @@ $(document).ready(function() {
                 dataType: "json",
                 context: this
             }).done(function(response) {
-                //location.reload();
+                location.reload();
             });
         });
     });

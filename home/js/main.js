@@ -121,6 +121,9 @@ function onDocumentMouseMove(event) {
 function onDocumentMouseUp(event) {
     event.preventDefault();
     isRightClick = false;
+    if (dragHotspotId != -1) {
+        endDragHotspot(dragHotspotId)
+    }
     dragHotspotId = -1;
     isUserInteracting = false;
     interactiveObject = undefined;
