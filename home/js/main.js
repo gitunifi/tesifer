@@ -259,7 +259,9 @@ function XYZtoLonLat(x, y, z) {
     var lonLat = [];
     lonLat[1] = Math.acos(y / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2))) - Math.PI / 2;
     lonLat[1] *= 180 / Math.PI;
-    lonLat[1] = Math.max(lonLat[1], latLimit); //BOH
+    lonLat[1] = - lonLat[1];
+    console.log(lonLat[1]);
+    //lonLat[1] = Math.max(lonLat[1], latLimit); //BOH
     if (x >= 0)
         lonLat[0] = Math.atan(z / x);
     else

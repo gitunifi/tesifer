@@ -10,8 +10,8 @@ function getHotspot() {
     var hotspotArray = getContent("hotspot", panoId);
     for (var i = 0; i < hotspotArray.length; i++) {
         var hotspot = hotspotArray[i];
-        var position = new THREE.Vector3(parseInt(hotspot['xPosition']*210), parseInt(hotspot['yPosition']), parseInt(hotspot['zPosition']*210));
-        var finalPosition = new THREE.Vector3(parseInt(hotspot['xPositionFinal']*210), parseInt(hotspot['yPositionFinal']), parseInt(hotspot['zPositionFinal']*210));
+        var position = new THREE.Vector3(parseInt(hotspot['xPosition']*210), parseInt(hotspot['yPosition']*210), parseInt(hotspot['zPosition']*210));
+        var finalPosition = new THREE.Vector3(parseInt(hotspot['xPositionFinal']*210), parseInt(hotspot['yPositionFinal']*210), parseInt(hotspot['zPositionFinal']*210));
         makeHotspot(finalPosition, hotspot['IdHotspot'], position);
     }
 }
@@ -85,7 +85,9 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         } else {
             planeMesh.translateX(distance);
         }
-        planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
+
+        planeMesh.rotateY(Math.PI*2/7);
+       // planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
 
         hotspotExternalMesh.position.set(planeMesh.position.x, planeMesh.position.y - (yDimension / 2) - 10, planeMesh.position.z);
         hotspotExternalMesh.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
@@ -137,7 +139,8 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         frame.position.set(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
 
         if (leftOrRight === "left") {
-            frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y + Math.PI, planeMesh.rotation.z);
+            frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
+            frame.rotateY(Math.PI);
         } else {
             frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
         }
@@ -147,27 +150,29 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 }
 
 function smoothZRotationTransition(object, rotationDelta, step) {
-    var stepsNeeded = Math.abs(Math.floor(rotationDelta / step));
-    var stepsDone = 0;
-    var actualTransition = function () {
+    //var stepsNeeded = Math.abs(Math.floor(rotationDelta / step));
+    //var stepsDone = 0;
+    /*var actualTransition = function () {
         if (stepsDone < stepsNeeded) {
             stepsDone++;
             if (rotationDelta > 0) {
-                object.rotation.z += step;
+                object.rotateZ(step);
             }
             else
-                object.rotation.z -= step;
+                object.rotateZ(-step);
             requestAnimationFrame(actualTransition);
         }
-    }
+    }*/
     //actualTransition();
-    object.rotation.z += rotationDelta;
+    object.rotateZ(rotationDelta);
 }
 
 function rotate(angle) {
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].hotspotId === interactiveObject.hotspotId) {
+            if (markers[i].name == "Gallery") {console.log("AA START:" + markers[i].rotation.z )};
             smoothZRotationTransition(markers[i], angle, Math.PI / 12);
+            if (markers[i].name == "Gallery") {console.log("AA END:" + markers[i].rotation.z )};
         }
     }
 }
@@ -203,8 +208,15 @@ function restoreHotspotPosition(hotspotId) {
 
 function restoreHotspotRotation() {
     for (var i = 0; i < markers.length; i++) {
-        if (markers[i].initialRotation != undefined) {
-            markers[i].rotation.z = markers[i].initialRotation;
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i].name != "Circle" && markers[i].name != "Circle2" && markers[i].name != "Line") {
+
+                if (markers[i].name != "Light") {
+                    if (markers[i].initialRotation != undefined) {
+                        markers[i].rotation.z = markers[i].initialRotation;
+                    }
+                }
+            }
         }
     }
 }
@@ -232,6 +244,23 @@ function manageHotspot() {
     cleanUpHotSpotContent();
     restoreHotspotRotation();
     hotspotArray = getContent("hotspotInfo", interactiveObject.hotspotId);
+    for (var i = 0; i < markers.length; i++) {
+        if (markers[i].name != "Circle" && markers[i].name != "Circle2" && markers[i].name != "Line") {
+
+            if (markers[i].name != "Light") {
+                markers[i].lookAt(new THREE.Vector3(0, 0, 0));
+                if (markers[i].name == "Object") {
+                    markers[i].rotation.z = markers[i].rotation.z + Math.PI * 5 / 4 + Math.PI * 5 / 360;
+                } else if (markers[i].name == "PDF") {
+                    markers[i].rotation.z = markers[i].rotation.z + Math.PI * 3 / 4 + Math.PI * 5 / 360;
+                } else if (markers[i].name == "Gallery") {
+                    markers[i].rotation.z = markers[i].rotation.z + Math.PI / 4 + Math.PI * 5 / 360;
+                } else if (markers[i].name == "Panorama") {
+                    markers[i].rotation.z = markers[i].rotation.z - Math.PI / 4 + Math.PI * 5 / 360;
+                }
+            }
+        }
+    }
 
     indent = 15;
     if (interactiveObject.position.x >= 0) {
@@ -245,6 +274,7 @@ function manageHotspot() {
         case "Gallery":
             if (rightPosition || selectedFrame !== interactiveObject) {
                 rotate(Math.PI / 2);
+
                 rightPosition = false;
                 var hotspotInfo = search("Gallery");
                 portal(hotspotInfo['Source'] + "?id=" + hotspotInfo['IdName'], interactiveObject.position, hotspotInfo["Width"], hotspotInfo["Height"], "left", 0xfcd402, 1.87, "Gallery");

@@ -505,6 +505,26 @@ class Panorama
 
         return $result;
     }
+
+    public function removePanoramaHotspot($idpanorama, $idhotspot)
+    {
+        $result = [
+            "success" => false
+        ];
+
+        if ($idpanorama > 0 && $idhotspot > 0) {
+
+            Db::delete(sprintf("
+                DELETE FROM HotspotNelPanorama WHERE idpanorama = '%d' and idhotspot = '%d';
+            ", $idpanorama, $idhotspot));
+
+            $result = [
+                "success" => true
+            ];
+        }
+
+        return $result;
+    }
 }
 
 

@@ -29,8 +29,16 @@ $(document).ready(function() {
                 ');
                     $("#thumbnail-hotspot" + value['id'] + " .remove-btn").off('click').click(function (e) {
                         e.stopPropagation();
-                        $(this).parent().parent().remove();
-                        $("#drag-hotspot" + $(this).parent().attr("data-id")).remove();
+                        $.ajax({
+                            url: "php/?controller=Panorama;removePanoramaHotspot;" + $("#drag1-wrapper").attr("data-id") + "," + $(this).parent().attr("data-id"),
+                            dataType: "json",
+                            context: this
+                        }).done(function(response) {
+                            if(response && response.success == true) {
+                                $("#drag-hotspot" + $(this).parent().attr("data-id")).remove();
+                                $(this).parent().parent().remove();
+                            }
+                        });
                     });
 
                     $("#drag1-wrapper").append(' \
@@ -89,8 +97,17 @@ $(document).ready(function() {
                 ');
                 $("#thumbnail-hotspot" + $(this).attr("data-id") + " .remove-btn").off('click').click(function (e) {
                     e.stopPropagation();
-                    $(this).parent().parent().remove();
-                    $("#drag-hotspot" + $(this).parent().attr("data-id")).remove();
+                    $.ajax({
+                        url: "php/?controller=Panorama;removePanoramaHotspot;" + $("#drag1-wrapper").attr("data-id") + "," + $(this).parent().attr("data-id"),
+                        dataType: "json",
+                        context: this
+                    }).done(function(response) {
+                        if(response && response.success == true) {
+                            $("#drag-hotspot" + $(this).parent().attr("data-id")).remove();
+                            $(this).parent().parent().remove();
+                        }
+                    });
+
                 });
 
                 $("#drag1-wrapper").append(' \
