@@ -29,10 +29,21 @@
                 var response = XYZtoLonLat(ui.item.idx, ui.item.idy, ui.item.idz);
                 load(ui.item.idPan, response[1], response[0], 0, 100);
                 return false;
+            },
+            response: function(event, ui) {
+                // ui.content is the array that's about to be sent to the response callback.
+                if (ui.content.length === 0) {
+                    $("#empty-message").text("No results found");
+                } else {
+                    $("#empty-message").empty();
+                }
             }
         }).autocomplete("instance")._renderItem = function (ul, item) {
             if (item.value != null) {
-                return $("<li>").append("<a>" + item.value + "</a>").appendTo(ul);
+                if (item.source != null) {
+                    return $("<li style='line-height: 12px;   padding-top: 5px;   padding-bottom: 5px;'>").append("<div>" + item.value + "</div><a style='font-size: 11px;'>Risultato trovato in " + item.source + "</a>").appendTo(ul);
+                }
+                return $("<li style='line-height: 12px;   padding-top: 5px;   padding-bottom: 5px;'>").append("<div>" + item.value + "</div>").appendTo(ul);
             }
         };
     });
@@ -146,7 +157,7 @@
             var panoName = getContent("panorama", panoId).pop()['Panorama'];
             getHotspot();
             var texture = THREE.ImageUtils.loadTexture('textures/' + panoName);
-            var geometry = new THREE.SphereGeometry(500, 60, 60);
+            var geometry = new THREE.SphereGeometry(1000, 60, 60);
             mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({map: texture}));
             mesh.scale.x = -1;
             mesh.position.set(0, 0, 0);
@@ -406,79 +417,80 @@
         var map;
 
         function makeMap() {
-            var panoInfo = getContent("panorama", panoId).pop();
-            var lat = panoInfo['EarthLatitude'];
-            var lng = panoInfo['EarthLongitude'];
+            if (typeof google != "undefined") {
+                var panoInfo = getContent("panorama", panoId).pop();
+                var lat = panoInfo['EarthLatitude'];
+                var lng = panoInfo['EarthLongitude'];
 
-            var mapOptions = {
-                center: { lat: parseFloat(lat), lng: parseFloat(lng)},
-                zoom: 15,
-                streetViewControl: false
-            };
-            map = new google.maps.Map(document.getElementById('mapdiv'), mapOptions);
+                var mapOptions = {
+                    center: {lat: parseFloat(lat), lng: parseFloat(lng)},
+                    zoom: 15,
+                    streetViewControl: false
+                };
+                map = new google.maps.Map(document.getElementById('mapdiv'), mapOptions);
 
 
+                var hotspotArray = getContent("hotspotPlaced");
+                $.each(hotspotArray, function (index, value) {
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(parseFloat(value['EarthLatitude']), parseFloat(value['EarthLongitude'])),
+                        map: map,
+                        icon: {
+                            url: 'images/marker-pin.png',
+                            anchor: {
+                                x: 10,
+                                y: 28
+                            }
+                        },
+                        title: value['Subject']
+                    });
 
-            var hotspotArray = getContent("hotspotPlaced");
-            $.each(hotspotArray, function(index, value) {
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(parseFloat(value['EarthLatitude']), parseFloat(value['EarthLongitude'])),
-                    map: map,
-                    icon: {
-                        url: 'images/marker-pin.png',
-                        anchor: {
-                            x: 10,
-                            y: 28
+                    pegman = new google.maps.Marker({
+                        position: new google.maps.LatLng(parseFloat(lat), parseFloat(lng)),
+                        map: map,
+                        icon: pegmanicon
+                    });
+
+                    google.maps.event.addListener(marker, 'click', function (e) {
+                        var xPosition = parseFloat(value['xPosition']);
+                        var yPosition = parseFloat(value['yPosition']);
+                        var zPosition = parseFloat(value['zPosition']);
+                        var response = XYZtoLonLat(xPosition, yPosition, zPosition);
+                        if (pegman != undefined) {
+                            pegmanicon.origin.y = offsetPegman * parseInt(response[0] / stepPegman);
+                            pegman.setIcon(pegmanicon);
                         }
-                    },
-                    title: value['Subject']
+                        load(value['IdPanorama'], response[1], response[0], 0, 1000);
+                        //load(12, 3, 0, 0, 100);
+                        //load(11, -3, 0, 0, 100);
+                        //load(8, -3, 0, 0, 100);
+                    });
                 });
-
-                pegman = new google.maps.Marker({
-                    position: new google.maps.LatLng(parseFloat(lat), parseFloat(lng)),
-                    map: map,
-                    icon: pegmanicon
-                });
-
-                google.maps.event.addListener(marker, 'click', function(e) {
-                    var xPosition = parseFloat(value['xPosition']);
-                    var yPosition = parseFloat(value['yPosition']);
-                    var zPosition = parseFloat(value['zPosition']);
-                    var response = XYZtoLonLat(xPosition, yPosition, zPosition);
-                    if (pegman != undefined) {
-                        pegmanicon.origin.y = offsetPegman * parseInt(response[0] / stepPegman);
-                        pegman.setIcon(pegmanicon);
+                $.ajax({
+                    type: "GET",
+                    url: "map/itinerario.gpx",
+                    dataType: "xml",
+                    complete: function (xml) {
+                        var points = [];
+                        var bounds = new google.maps.LatLngBounds();
+                        $(xml.responseXML).find("trkpt").each(function () {
+                            var lat = $(this).attr("lat");
+                            var lon = $(this).attr("lon");
+                            var p = new google.maps.LatLng(lat, lon);
+                            points.push(p);
+                            bounds.extend(p);
+                        });
+                        var poly = new google.maps.Polyline({
+                            // use your own style here
+                            path: points,
+                            strokeColor: "#00DD00",
+                            strokeOpacity: .7,
+                            strokeWeight: 4
+                        });
+                        poly.setMap(map);
                     }
-                    load(value['IdPanorama'], response[1], response[0], 0, 1000);
-                    //load(12, 3, 0, 0, 100);
-                    //load(11, -3, 0, 0, 100);
-                    //load(8, -3, 0, 0, 100);
                 });
-            });
-            $.ajax({
-                type: "GET",
-                url:  "map/itinerario.gpx",
-                dataType: "xml",
-                complete: function(xml) {
-                    var points = [];
-                    var bounds = new google.maps.LatLngBounds();
-                    $(xml.responseXML).find("trkpt").each(function () {
-                        var lat = $(this).attr("lat");
-                        var lon = $(this).attr("lon");
-                        var p = new google.maps.LatLng(lat, lon);
-                        points.push(p);
-                        bounds.extend(p);
-                    });
-                    var poly = new google.maps.Polyline({
-                        // use your own style here
-                        path: points,
-                        strokeColor: "#00DD00",
-                        strokeOpacity: .7,
-                        strokeWeight: 4
-                    });
-                    poly.setMap(map);
-                }
-            });
+            }
         }
     </script>
 

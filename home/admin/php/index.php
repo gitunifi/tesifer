@@ -1,5 +1,18 @@
 <?php
 
+define('__DS__',            DIRECTORY_SEPARATOR);
+
+
+function __autoload($class)
+{
+    if (stripos($class, 'Smalot') === 0)
+    {
+        include_once str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+    }
+
+}
+
+
 require "db.php";
 require "lib.php";
 

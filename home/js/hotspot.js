@@ -141,6 +141,7 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         } else {
             frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
         }
+        window.frame = frame;
         scene.add(frame);
     }
 }
@@ -361,22 +362,22 @@ function makeHotspot(position, id, initialPosition) {
     var torusGeometry = new THREE.LatheGeometry(pts, 12, 0, Math.PI * 165 / 360);
 
     /*var arcShape = new THREE.Shape();
-    arcShape.moveTo( 0, 0 );
-    arcShape.arc( 0, 0, radius, 0, Math.PI * 170 / 360, true );
+     arcShape.moveTo( 0, 0 );
+     arcShape.arc( 0, 0, radius, 0, Math.PI * 170 / 360, true );
 
-    var holePath = new THREE.Path();
-    holePath.moveTo( 0, 0 );
-    holePath.arc( 0, 0, radius2, 0, Math.PI * 170 / 360, true );
-    arcShape.holes.push( holePath );
+     var holePath = new THREE.Path();
+     holePath.moveTo( 0, 0 );
+     holePath.arc( 0, 0, radius2, 0, Math.PI * 170 / 360, true );
+     arcShape.holes.push( holePath );
 
-    var extrudeSettings = {
-        amount : 2,
-        steps: 100,
-        bevelThickness: 0,
-        bevelSize: 0
-    };
+     var extrudeSettings = {
+     amount : 2,
+     steps: 100,
+     bevelThickness: 0,
+     bevelSize: 0
+     };
 
-    var torusGeometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);*/
+     var torusGeometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);*/
 
     var light = new THREE.PointLight( 0x555555, 5, radius*2 );
     light.position.set( position.x, position.y, position.z );

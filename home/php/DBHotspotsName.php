@@ -28,18 +28,32 @@ class Autocomplete
 		$pieces = explode(" ", $this->term);
 		$num_word = count($pieces);
 		
-		$sql = "select IdHotspot, Subject, IdPanorama, xPosition, yPosition, zPosition from Hotspot, HotspotNelPanorama  WHERE Hotspot.ID = HotspotNelPanorama.IdHotspot and (";
+		$sql = "
+			SELECT DISTINCT hp.IdHotspot, h.Subject, hp.IdPanorama, hp.xPosition, hp.yPosition, hp.zPosition, p.Source
+			FROM
+			 	HotspotNelPanorama hp,
+				Hotspot h
+			LEFT JOIN
+				HotspotInfo hi
+			ON
+				h.id = hi.hotspotid AND
+				hi.name = 'PDF'
+			LEFT JOIN
+				PDF p
+			ON
+				hi.idname = p.id
+			WHERE
+				h.ID = hp.IdHotspot and (p.contenuto like '%" . $this->term . "%' ";
 			
 		
 		for ($k = 0; $k < $num_word; $k++)
 		{	
-			if ($k == 0)
-				$sql .= "Subject Like '%".$pieces[$k]."%'";
-			elseif ($pieces[$k] != "" && $pieces[$k] != null)
-				$sql .= " OR Subject Like '%".$pieces[$k]."%'";
+			if ($pieces[$k] != "" && $pieces[$k] != null)
+				$sql .= " OR h.Subject Like '%".$pieces[$k]."%'";
 		}
+
 		$sql .= ")";
-		//echo $sql;
+
 		//"Subject Like '%$this->term%'"
 		
 		
@@ -58,8 +72,9 @@ class Autocomplete
 				$arr['idx']= $row['xPosition'];
 				$arr['idy']= $row['yPosition'];
 				$arr['idz']= $row['zPosition'];
-				$arr['idHot']= $row['IdHotspot']; 
-				if ($i == 0)
+				$arr['idHot']= $row['IdHotspot'];
+			    $arr['source']= $row['Source'];
+			   if ($i == 0)
 					echo json_encode($arr);
 				else
 					echo ",".json_encode($arr);
