@@ -131,97 +131,111 @@ function onDocumentMouseUp(event) {
 
 function onDocumentMouseWheel(event) {
     event.preventDefault();
-    if (typeof zoomEnabled != "undefined" && zoomEnabled) {
-        if (!amILoading) {
-            //var previousFov = fov;
-            var delta;
-            if (event.wheelDeltaY) {
-                delta = event.wheelDeltaY;
-            } else if (event.wheelDelta) {
-                delta = event.wheelDelta;
-            } else if (event.detail) {
-                delta = event.detail;
-            }
-            var sub = fov - Math.min((delta * 0.05), 2);
-            var zoom = maxZoom;
-            var posLat = -1;
-            var posLon = -1;
-            var beforeFov = fov;
-            var indice = whichTransitionDirection();
-            if (indice !== undefined & delta > 0) {
-                zoom = ZoomArray[indice]['ZoomNext'];
-                posLat = ZoomArray[indice]['Latitude'];
-                posLon = ZoomArray[indice]['Longitude'];
-            }
-            if (zoom <= sub && sub <= minZoom) {
+    if (typeof zoomEnabled != "undefined") {
+        if (zoomEnabled) {
+            if (!amILoading) {
+                //var previousFov = fov;
+                var delta;
                 if (event.wheelDeltaY) {
-                    fov -= Math.min((delta * 0.05), 2);
+                    delta = event.wheelDeltaY;
                 } else if (event.wheelDelta) {
-                    fov -= Math.min((delta * 0.05), 2);
+                    delta = event.wheelDelta;
                 } else if (event.detail) {
-                    fov += Math.min((delta * 1.0), 2);
+                    delta = event.detail;
                 }
-
-                if (posLat != -1 && posLon != -1) {
-                    var current_diff = beforeFov - fov;
-                    var total_diff = beforeFov - zoom;
-                    var diff_lon = lon - posLon;
-                    var diff_lat = lat - posLat;
-                    lon -= diff_lon * (current_diff / total_diff);
-                    lat -= diff_lat * (current_diff / total_diff);
+                var sub = fov - Math.min((delta * 0.05), 2);
+                var zoom = maxZoom;
+                var posLat = -1;
+                var posLon = -1;
+                var beforeFov = fov;
+                var indice = whichTransitionDirection();
+                if (indice !== undefined & delta > 0) {
+                    zoom = ZoomArray[indice]['ZoomNext'];
+                    posLat = ZoomArray[indice]['Latitude'];
+                    posLon = ZoomArray[indice]['Longitude'];
                 }
-
-                if (planeMesh !== undefined) {
-                    planeMesh.scale.x = fov / noZoomLevel;
-                    planeMesh.scale.y = fov / noZoomLevel;
-                }
-                camera.projectionMatrix.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
-                render();
-            }
-            if (sub < zoom & delta > 0) {
-                getNewPanorama(panoId);
-            }
-            //Zoom Previous
-            /*if (delta < 0 && fov > 69.) { // 69. FIXME
-                var previousPanoArray = getContent("previousPano", panoId);
-                while (previousPanoArray.length > 0) {
-                    var candidatePreviousPano = previousPanoArray.pop();
-                    if (Math.abs(lat - candidatePreviousPano['LatitudeOnLoad']) < 20 &
-                        Math.abs(lon - candidatePreviousPano['LongitudeOnLoad']) < 20) {
-                        load(candidatePreviousPano['IdCalling'], candidatePreviousPano['Latitude'], candidatePreviousPano['Longitude']);
+                if (zoom <= sub && sub <= minZoom) {
+                    if (event.wheelDeltaY) {
+                        fov -= Math.min((delta * 0.05), 2);
+                    } else if (event.wheelDelta) {
+                        fov -= Math.min((delta * 0.05), 2);
+                    } else if (event.detail) {
+                        fov += Math.min((delta * 1.0), 2);
                     }
-                }
-            }*/
 
+                    if (posLat != -1 && posLon != -1) {
+                        var current_diff = beforeFov - fov;
+                        var total_diff = beforeFov - zoom;
+                        var diff_lon = lon - posLon;
+                        var diff_lat = lat - posLat;
+                        lon -= diff_lon * (current_diff / total_diff);
+                        lat -= diff_lat * (current_diff / total_diff);
+                    }
+
+                    if (planeMesh !== undefined) {
+                        planeMesh.scale.x = fov / noZoomLevel;
+                        planeMesh.scale.y = fov / noZoomLevel;
+                    }
+                    camera.projectionMatrix.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
+                    render();
+                }
+                if (sub < zoom & delta > 0) {
+                    getNewPanorama(panoId);
+                }
+                //Zoom Previous
+                /*if (delta < 0 && fov > 69.) { // 69. FIXME
+                 var previousPanoArray = getContent("previousPano", panoId);
+                 while (previousPanoArray.length > 0) {
+                 var candidatePreviousPano = previousPanoArray.pop();
+                 if (Math.abs(lat - candidatePreviousPano['LatitudeOnLoad']) < 20 &
+                 Math.abs(lon - candidatePreviousPano['LongitudeOnLoad']) < 20) {
+                 load(candidatePreviousPano['IdCalling'], candidatePreviousPano['Latitude'], candidatePreviousPano['Longitude']);
+                 }
+                 }
+                 }*/
+
+            }
+        } else {
+            $("#noZoom").show();
+            setTimeout(function() {
+                $("#noZoom").hide();
+            }, 1000);
         }
     }
 }
 
 function onDocumentDoubleclick(event) {
-    if (typeof zoomEnabled === "undefined" || zoomEnabled) {
-        var predefinedZoom = Math.floor(((minZoom - maxZoom) / 3) * 1000) / 1000;
-        var zoom = maxZoom;
-        var indice = whichTransitionDirection();
-        if (indice !== undefined) {
-            zoom = ZoomArray[indice]['ZoomNext'];
-        }
-        var newFov = fov - predefinedZoom;
-        if (zoom < newFov && newFov < minZoom) {
-            fov -= predefinedZoom;
-            camera.projectionMatrix.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
-            render();
-        }
-        else {
-            var found = getNewPanorama(panoId);
-            if (!found) {
-                fov = 70;
+    if (typeof zoomEnabled != "undefined") {
+        if (zoomEnabled) {
+            var predefinedZoom = Math.floor(((minZoom - maxZoom) / 3) * 1000) / 1000;
+            var zoom = maxZoom;
+            var indice = whichTransitionDirection();
+            if (indice !== undefined) {
+                zoom = ZoomArray[indice]['ZoomNext'];
+            }
+            var newFov = fov - predefinedZoom;
+            if (zoom < newFov && newFov < minZoom) {
+                fov -= predefinedZoom;
                 camera.projectionMatrix.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
                 render();
             }
-        }
-        if (typeof planeMesh !== "undefined" && planeMesh !== undefined) {
-            planeMesh.scale.x = fov / noZoomLevel;
-            planeMesh.scale.y = fov / noZoomLevel;
+            else {
+                var found = getNewPanorama(panoId);
+                if (!found) {
+                    fov = 70;
+                    camera.projectionMatrix.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
+                    render();
+                }
+            }
+            if (typeof planeMesh !== "undefined" && planeMesh !== undefined) {
+                planeMesh.scale.x = fov / noZoomLevel;
+                planeMesh.scale.y = fov / noZoomLevel;
+            }
+        } else {
+            $("#noZoom").show();
+            setTimeout(function() {
+                $("#noZoom").hide();
+            }, 1000);
         }
     }
 }

@@ -173,7 +173,11 @@ function smoothZRotationTransition(object, rotationDelta, step) {
 function rotate(angle) {
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].hotspotId === interactiveObject.hotspotId) {
-            smoothZRotationTransition(markers[i], angle, Math.PI / 12);
+            if (markers[i].name != "Circle" && markers[i].name != "Circle2" && markers[i].name != "Line") {
+                if (markers[i].name != "Light") {
+                    smoothZRotationTransition(markers[i], angle, Math.PI / 12);
+                }
+            }
         }
     }
 }
@@ -631,8 +635,6 @@ function makeHotspot(position, id, initialPosition) {
     var line = new THREE.Line(geometry, lineMaterial, THREE.LineStrip);
     line.name = "Line";
     line.hotspotId = id;
-    if (dist == 0)
-        line.visible = false;
     scene.add(line);
     markers.push(line);
 
@@ -681,16 +683,6 @@ function dragHotspot(hotspotId, position) {
     restoreHotspotRotation();
     selectedFrame = undefined;
 
-    var diffX = 0;
-    var diffZ = 0;
-
-    for (var i = 0; i < markers.length; i++) {
-        if (markers[i].hotspotId === hotspotId && markers[i].name == "Line") {
-            diffX = Math.abs(pos.x - markers[i].geometry.vertices[0].x);
-            diffZ = Math.abs(pos.z - markers[i].geometry.vertices[0].z);
-        }
-    }
-
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].hotspotId === hotspotId) {
             if (markers[i].name != "Circle" && markers[i].name != "Circle2" && markers[i].name != "Line") {
@@ -709,19 +701,9 @@ function dragHotspot(hotspotId, position) {
                     }
                 }
             } else if (markers[i].name == "Line") {
-                if (diffX > 50 || diffZ > 50) {
-                    markers[i].visible = true;
-                } else {
-                    markers[i].visible = true;
-                }
                 markers[i].geometry.vertices[1].set(pos.x, pos.y, pos.z);
                 markers[i].geometry.verticesNeedUpdate = true;
             } else if (markers[i].name == "Circle" || markers[i].name == "Circle2") {
-                if (diffX > 50 || diffZ > 50) {
-                    markers[i].visible = true;
-                } else {
-                    markers[i].visible = true;
-                }
             }
         }
     }
