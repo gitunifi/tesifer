@@ -82,15 +82,18 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
         if (leftOrRight === "left") {
             planeMesh.translateX(-distance);
+            planeMesh.rotateY(Math.PI*2/7);
         } else {
             planeMesh.translateX(distance);
+            planeMesh.rotateY(-Math.PI*2/7);
         }
 
-        planeMesh.rotateY(Math.PI*2/7);
+
        // planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
 
-        hotspotExternalMesh.position.set(planeMesh.position.x, planeMesh.position.y - (yDimension / 2) - 10, planeMesh.position.z);
+        hotspotExternalMesh.position.set(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
         hotspotExternalMesh.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
+        hotspotExternalMesh.translateY( - (yDimension / 2) - 10);
 
         cssScene.add(hotspotExternalMesh);
         cssObjects.push(hotspotExternalMesh);
@@ -170,9 +173,7 @@ function smoothZRotationTransition(object, rotationDelta, step) {
 function rotate(angle) {
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].hotspotId === interactiveObject.hotspotId) {
-            if (markers[i].name == "Gallery") {console.log("AA START:" + markers[i].rotation.z )};
             smoothZRotationTransition(markers[i], angle, Math.PI / 12);
-            if (markers[i].name == "Gallery") {console.log("AA END:" + markers[i].rotation.z )};
         }
     }
 }
@@ -417,11 +418,12 @@ function makeHotspot(position, id, initialPosition) {
     scene.add(light);
 
 
-    if (sourceArray['Panorama'] !== null) {
-        var materials1 =
+    if (sourceArray['Panorama'] !== null && sourceArray['Panorama'] !== undefined) {
+        var materials1 = [
             new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/pano_icon_vertical.png')
-            });
+            })
+        ];
 
     }
     else {
@@ -434,7 +436,7 @@ function makeHotspot(position, id, initialPosition) {
 
 
 
-    var torusMaterial = materials1;//new THREE.MeshFaceMaterial(materials1);
+    var torusMaterial = new THREE.MeshFaceMaterial(materials1);
     var torus1 = new THREE.Mesh(torusGeometry, torusMaterial);
     torus1.position.set(position.x, position.y, position.z);
 
@@ -448,7 +450,7 @@ function makeHotspot(position, id, initialPosition) {
     markers.push(torus1);
     scene.add(torus1);
 
-    if (sourceArray['Gallery'] !== null) {
+    if (sourceArray['Gallery'] !== null && sourceArray['Gallery'] !== undefined) {
         var materials2 = [
             new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/gallery_icon_horizontal.png')
@@ -476,7 +478,7 @@ function makeHotspot(position, id, initialPosition) {
     markers.push(torus2);
     scene.add(torus2);
 
-    if (sourceArray['PDF'] !== null) {
+    if (sourceArray['PDF'] !== null && sourceArray['PDF'] !== undefined) {
         var materials3 = [
             new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/pdf_icon_horizontal_reflected.png')
@@ -502,7 +504,7 @@ function makeHotspot(position, id, initialPosition) {
     markers.push(torus3);
     scene.add(torus3);
 
-    if (sourceArray['Object'] !== null) {
+    if (sourceArray['Object'] !== null && sourceArray['Object'] !== undefined) {
         var materials4 = [
             new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/3d_icon_horizontal.png')

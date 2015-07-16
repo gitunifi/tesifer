@@ -45,9 +45,9 @@ $(document).ready(function() {
                         <div id="drag-hotspot' + value['id'] + '" class="draggable drag-hotspot" data-id="' + value['id'] + '" align="center" style="position: absolute !important; display: inline-block; height: 50px; width: 50px; font-size: 50px; color: #0080c0; border: 0px solid; cursor: pointer;"><i class="fa fa-certificate" style="color: ' + color + ';"></i></div> \
                     ');
 
-                    $("#drag-hotspot" + value['id']).draggable({ containment: "#drag1-wrapper", scroll: false, axis: "x"});
+                    $("#drag-hotspot" + value['id']).draggable({ containment: "#drag1-wrapper", scroll: false });
                     $("#drag-hotspot" + value['id']).css("left", (parseInt(value['angolo']) * $("#drag1-wrapper").width() / 360) + "px");
-                    $("#drag-hotspot" + value['id']).css("top", ($("#drag1-wrapper").height()/2 - $("#drag-hotspot" + value['id']).height()/2) + "px");
+                    $("#drag-hotspot" + value['id']).css("top", ((parseInt(value['angoloY'])+60) * $("#drag1-wrapper").height() / 120) + "px");
                 }
             });
         }
@@ -114,8 +114,8 @@ $(document).ready(function() {
                     <div id="drag-hotspot' + $(this).attr("data-id") + '" class="draggable drag-hotspot" data-id="' + $(this).attr("data-id") + '" align="center" style="position: absolute !important; display: inline-block; height: 50px; width: 50px; font-size: 50px; color: #0080c0; border: 0px solid; cursor: pointer;"><i class="fa fa-certificate" style="color: ' + color + ';"></i></div> \
                 ');
                 $("#drag-hotspot" + $(this).attr("data-id")).css("left", 0);
-                $("#drag-hotspot" + $(this).attr("data-id")).css("top", $("#drag1-wrapper").height()/2 - $("#drag-hotspot" + $(this).attr("data-id")).height()/2);
-                $("#drag-hotspot" + $(this).attr("data-id")).draggable({ containment: "#drag1-wrapper", scroll: false, axis: "x"});
+                $("#drag-hotspot" + $(this).attr("data-id")).css("top", 0);
+                $("#drag-hotspot" + $(this).attr("data-id")).draggable({ containment: "#drag1-wrapper", scroll: false });
             }
             $("#hotspot-modal").modal('hide');
             return false;
@@ -140,7 +140,7 @@ $(document).ready(function() {
     $("#link-save").click(function() {
         $(".drag-hotspot").each(function(index, value) {
             var left = parseFloat($(this).css("left")) * 360 / ($("#drag1-wrapper").width());
-            var top = parseFloat($(this).css("top")) + ($(this).height()/2) - ($("#drag1-wrapper").height()/2);
+            var top = (parseFloat($(this).css("top")) * 120 / ($("#drag1-wrapper").height())) - 60;
             $.ajax({
                 url: "php/?controller=Panorama;addPanoramaHotspot;" + $("#drag1-wrapper").attr("data-id") + "," + $(this).attr("data-id") + "," + left + "," + top,
                 dataType: "json",

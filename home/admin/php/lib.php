@@ -367,7 +367,7 @@ class Panorama
     }
 
     public function addPanorama()
-    { error_reporting(E_ALL);
+    {
         $uploaddir = '../../textures/';
         $file = basename($_FILES['userfile']['name']);
         $nfile = $file;
@@ -440,7 +440,7 @@ class Panorama
             WHERE p.idpanorama = '%d' and p.idhotspot = '%d'
         ", $panorama, $hotspot));
 
-        if (isset($exists[0])) {
+        /*if (isset($exists[0])) {
             Db::update(sprintf("
                 UPDATE HotspotNelPanorama set xPosition = '%s', yPosition = '%s', zPosition = '%s', xPositionFinal = '%s', yPositionFinal = '%s', zPositionFinal = '%s', angolo = '%s', angoloY = '%s' where idpanorama = '%d' and idhotspot = '%d';
             ", cos(deg2rad($left)), 0, sin(deg2rad($left)), cos(deg2rad($left)), 0, sin(deg2rad($left)), $left, $top, $panorama, $hotspot));
@@ -448,6 +448,18 @@ class Panorama
             Db::insert(sprintf("
                 INSERT INTO HotspotNelPanorama VALUES ('%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');
             ", $panorama, $hotspot, cos(deg2rad($left)), 0, sin(deg2rad($left)), cos(deg2rad($left)), 0, sin(deg2rad($left), $left, $top)));
+        }*/
+        $aleft = deg2rad($left);
+        $atop = deg2rad(-$top);
+
+        if (isset($exists[0])) {
+            Db::update(sprintf("
+                UPDATE HotspotNelPanorama set xPosition = '%s', yPosition = '%s', zPosition = '%s', xPositionFinal = '%s', yPositionFinal = '%s', zPositionFinal = '%s', angolo = '%s', angoloY = '%s' where idpanorama = '%d' and idhotspot = '%d';
+            ", cos($atop)*cos($aleft), sin($atop), cos($atop)*sin($aleft), cos($atop)*cos($aleft), sin($atop), cos($atop)*sin($aleft), $left, $top, $panorama, $hotspot));
+        } else {
+            Db::insert(sprintf("
+                INSERT INTO HotspotNelPanorama VALUES ('%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');
+            ", $panorama, $hotspot, cos($atop)*cos($aleft), sin($atop), cos($atop)*sin($aleft), cos($atop)*cos($aleft), sin($atop), cos($atop)*sin($aleft), $left, $top));
         }
 
         $result["success"] = true;
