@@ -46,6 +46,18 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         if (fov < 40)
             resetZoom();
         var planeMaterial = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1});
+        var scale = 1;
+        var translate = 0;
+        var rotate = Math.PI*2/7;
+        var externalOffset = 10;
+        var rotateToCenter = true;
+        if (Math.abs(hotspotPosition.y) > 50) {
+            scale = 3/5;
+            translate = -45;
+            rotate = 0;
+            externalOffset = 5;
+            rotateToCenter = false;
+        }
 
         //determina la dimensione del box nero
         //ATTENZIONE!!! la dimensione del box nero non viene modificata insieme alla dimensione del contenuto!
@@ -70,10 +82,9 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 
         elementExternaLink.href = html;
         elementExternaLink.target = "_blank";
-        elementExternaLink.innerHTML = "<img src='images/external_link.png' width='16' height='auto'/>";
+        elementExternaLink.innerHTML = "<img src='images/external_link.png' width='14' height='auto'/>";
         elementExternaLink.position = "absolute";
         hotspotExternalMesh = new THREE.CSS3DObject(elementExternaLink);
-
 
         planeMesh.url = html;
 
@@ -81,19 +92,22 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
 
         planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
         if (leftOrRight === "left") {
-            planeMesh.translateX(-distance);
-            planeMesh.rotateY(Math.PI*2/7);
+            planeMesh.translateX(-distance-translate);
+            planeMesh.rotateY(rotate);
         } else {
-            planeMesh.translateX(distance);
-            planeMesh.rotateY(-Math.PI*2/7);
+            planeMesh.translateX(distance+translate);
+            planeMesh.rotateY(-rotate);
+
         }
+        planeMesh.scale.x = scale;
+        planeMesh.scale.y = scale;
 
 
        // planeMesh.lookAt(new THREE.Vector3(0, 0, 0));
 
         hotspotExternalMesh.position.set(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
         hotspotExternalMesh.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
-        hotspotExternalMesh.translateY( - (yDimension / 2) - 10);
+        hotspotExternalMesh.translateY( - ((yDimension * scale) / 2) - externalOffset);
 
         cssScene.add(hotspotExternalMesh);
         cssObjects.push(hotspotExternalMesh);
@@ -116,10 +130,12 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         cssObject = new THREE.CSS3DObject(element);
 
         //adattamento delle dimensioni, ridimensionando anche il contenuto
-
+        cssObject.scale.x = scale;
+        cssObject.scale.y = scale;
 
         cssObject.scale.setX(cssObject.scale.x / resolution);
         cssObject.scale.setY(cssObject.scale.y / resolution);
+
 
 
         /*
@@ -137,8 +153,13 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         cssScene.add(cssObject);
         cssObjects.push(cssObject);
 
-        var response = XYZtoLonLat(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
-        smoothLonLatTransition(response[0], response[1], 3);
+        if (rotateToCenter) {
+            var response = XYZtoLonLat(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
+            smoothLonLatTransition(response[0], response[1], 3);
+        } else {
+            var response = XYZtoLonLat((planeMesh.position.x + hotspotPosition.x) / 2, (planeMesh.position.y + hotspotPosition.y) / 2, (planeMesh.position.z + hotspotPosition.z) / 2);
+            smoothLonLatTransition(response[0], response[1], 3);
+        }
         frame.position.set(planeMesh.position.x, planeMesh.position.y, planeMesh.position.z);
 
         if (leftOrRight === "left") {
@@ -147,6 +168,8 @@ function portal(html, hotspotPosition, width, height, leftOrRight, color, resolu
         } else {
             frame.rotation.set(planeMesh.rotation.x, planeMesh.rotation.y, planeMesh.rotation.z);
         }
+        frame.scale.x = scale;
+        frame.scale.y = scale;
         window.frame = frame;
         scene.add(frame);
     }
