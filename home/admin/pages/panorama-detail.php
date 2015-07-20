@@ -1,6 +1,6 @@
 <div id="link-container" class="row">
     <div class="col-lg-12">
-        <h1 class="page-header"><a href="?page=collegamenti">Panorama</a> / Modifica panorama <button id="link-save" type="button" class="btn btn-success" style="float:right;"><i class="fa fa-save"></i> Salva</button> <a href="../index.html?id=<?php echo $params["id"]; ?>" target="_blank" class="btn btn-primary" style="float:right; margin-right: 5px;"><i class="fa fa-eye"></i> Visualizza</a> </h1>
+        <h1 class="page-header"><a href="?page=panorama">Panorama</a> / Modifica panorama <button id="link-save" type="button" class="btn btn-success" style="float:right;"><i class="fa fa-save"></i> Salva</button> <a href="../index.html?id=<?php echo $params["id"]; ?>" target="_blank" class="btn btn-primary" style="float:right; margin-right: 5px;"><i class="fa fa-eye"></i> Visualizza</a> </h1>
     </div>
     <div class="col-xs-6 col-md-3">
         <div id="hotspot-add" class="thumbnail" align="center" style="background-color: #f5f5f5; cursor: pointer;">
