@@ -727,6 +727,7 @@ function dragHotspot(hotspotId, position) {
                 markers[i].geometry.vertices[1].set(pos.x, pos.y, pos.z);
                 markers[i].geometry.verticesNeedUpdate = true;
             } else if (markers[i].name == "Circle" || markers[i].name == "Circle2") {
+                markers[i].visible = true;
             }
         }
     }

@@ -130,6 +130,32 @@ class Gallery
         return $result;
     }
 
+    public function addMedia()
+    {
+        error_reporting(E_ALL);
+        ini_set('display_errors', '1');
+        $uploaddir = '../../objects/';
+        $file = basename($_FILES['userfilemedia']['name']);
+        $nfile = $file;
+        $i = 1;
+        $uploadfile = $uploaddir . $nfile;
+        while (file_exists($uploadfile) && $i < 10000) {
+            $nfile = str_replace(".", $i . ".", $file);
+            $uploadfile = $uploaddir . $nfile;
+            $i++;
+        }
+        if(!file_exists($uploadfile)) {
+            if (move_uploaded_file($_FILES['userfilemedia']['tmp_name'], $uploadfile)) {
+                Db::insert(sprintf("
+                    INSERT INTO Media(source, thumbnail) VALUES ('%s', '%s');
+                ", $nfile, $nfile));
+            }
+        }
+
+        header("location: ../?page=galleria");
+        exit;
+    }
+
     public function updateGallery($idgallery)
     {
         $result = [
