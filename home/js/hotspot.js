@@ -20,7 +20,10 @@ function getHotspot() {
         for (var i = 0; i < markers.length; i++) {
             if (markers[i].name == "PDF") {
                 interactiveObject = markers[i];
-                manageHotspot();
+                setTimeout(function() {
+                    manageHotspot();
+                }, 1000);
+
                 return;
             }
         }
