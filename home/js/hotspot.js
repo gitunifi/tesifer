@@ -14,6 +14,14 @@ function getHotspot() {
         var finalPosition = new THREE.Vector3(parseInt(hotspot['xPositionFinal']*210), parseInt(hotspot['yPositionFinal']*210), parseInt(hotspot['zPositionFinal']*210));
         makeHotspot(finalPosition, hotspot['IdHotspot'], position);
     }
+
+    for (var i = 0; i < markers.length ; i++ ) {
+        if (markers[i].name == "PDF") {
+            interactiveObject = markers[i];
+            manageHotspot();
+            return;
+        }
+    }
 }
 
 function cleanUpHotSpotContent() {
