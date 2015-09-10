@@ -26,7 +26,7 @@
                     $(".errLogin").css({"display":"inherit"});
                     setTimeout(function() {$(".errLogin").hide();}, 6000);
                 } else {
-                    location.href = "index.php";
+                    //location.href = "index.php";
                 }
             }, "json");
         } else {
