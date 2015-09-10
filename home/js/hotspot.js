@@ -19,10 +19,9 @@ function getHotspot() {
         window.opened = false;
         for (var i = 0; i < markers.length; i++) {
             if (markers[i].name == "PDF") {
-                interactiveObject = markers[i];
-
                 var response = XYZtoLonLat(markers[i].position.x, markers[i].position.y, markers[i].position.z);
                 smoothLonLatTransition(response[0], response[1], 3);
+                interactiveObject = markers[i];
                 setTimeout(function() {
                     manageHotspot();
                 }, 1000);
