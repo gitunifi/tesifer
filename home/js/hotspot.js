@@ -21,6 +21,9 @@ function getHotspot() {
             if (markers[i].name == "PDF") {
                 interactiveObject = markers[i];
                 setTimeout(function() {
+                    camera.target.x = markers[i].position.x;
+                    camera.target.y = markers[i].position.y;
+                    camera.target.z = markers[i].position.z;
                     manageHotspot();
                 }, 1000);
 
