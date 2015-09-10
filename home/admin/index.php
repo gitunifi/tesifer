@@ -1,5 +1,21 @@
 <?php
 
+session_start();
+
+if (!isset($_SESSION["logged"])) {
+    if (isset($_POST["username"]) && isset($_POST["password"])) {
+        if ($_POST["username"] == "tesifer" && $_POST["password" == "tesifer"]) {
+            $_SESSION["logged"] = "1";
+        } else {
+            header("Location: login.php");
+            exit;
+        }
+    } else {
+        header("Location: login.php");
+        exit;
+    }
+}
+
 $page = "home";
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
