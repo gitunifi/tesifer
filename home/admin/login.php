@@ -21,7 +21,7 @@
 <script>
     function login(){
         if($("#username").val().trim() != "" && $("#password").val().trim() != ""){
-            $.post( "index.php", $("#formLogin").serialize(),function( ok ) {
+            $.post( "index.php", {username: $("#username").val(), password: $("#password").val()},function( ok ) {
                 if(ok == "false"){
                     $(".errLogin").css({"display":"inherit"});
                     setTimeout(function() {$(".errLogin").hide();}, 6000);
