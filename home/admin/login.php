@@ -1,3 +1,4 @@
+<script src="components/jquery/dist/jquery.min.js"></script>
 <div id="popUpLogin" class="popUp">
     <div id="formAutenticazione" class="formAutenticazione">
         <h3>Effettua il login</h3>
@@ -20,7 +21,7 @@
 <script>
     function login(){
         if($("#username").val().trim() != "" && $("#password").val().trim() != ""){
-            $.post( "app/lib.php", $("#formLogin").serialize(),function( ok ) {
+            $.post( "index.php", $("#formLogin").serialize(),function( ok ) {
                 if(ok == false){
                     $(".errLogin").css({"display":"inherit"});
                     setTimeout(function() {$(".errLogin").hide();}, 6000);
