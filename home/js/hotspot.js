@@ -15,8 +15,8 @@ function getHotspot() {
         makeHotspot(finalPosition, hotspot['IdHotspot'], position);
     }
 
-    if (open) {
-        open = false;
+    if (window.opened) {
+        window.opened = false;
         for (var i = 0; i < markers.length; i++) {
             if (markers[i].name == "PDF") {
                 interactiveObject = markers[i];

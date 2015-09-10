@@ -19,7 +19,7 @@
     <button id="search-button"><i class="fa fa-lentina"></i></button>
 </div>
 <script>
-    var open = false;
+    window.opened = false;
     $(function () {
 
         $("#search").autocomplete({
@@ -28,7 +28,7 @@
             select: function (event, ui) {
                 $("#search").val(ui.item.value);
                 var response = XYZtoLonLat(ui.item.idx, ui.item.idy, ui.item.idz);
-                open = true;
+                window.opened = true;
                 load(ui.item.idPan, response[1], response[0], 0, 100);
                 return false;
             },
