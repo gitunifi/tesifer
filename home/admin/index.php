@@ -16,6 +16,11 @@ if (!isset($_SESSION["logged"])) {
         header("Location: login.php");
         exit;
     }
+} else {
+    if (isset($_POST["username"]) && isset($_POST["password"])) {
+        echo true;
+        exit;
+    }
 }
 
 $page = "home";
