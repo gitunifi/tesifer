@@ -29,7 +29,7 @@ class Autocomplete
 		$num_word = count($pieces);
 		
 		$sql = "
-			SELECT DISTINCT hp.IdHotspot, h.Subject, hp.IdPanorama, hp.xPosition, hp.yPosition, hp.zPosition, p.Source
+			SELECT DISTINCT hp.IdHotspot, h.Subject, hp.IdPanorama, hp.xPositionFinal xPosition, hp.yPositionFinal yPosition, hp.zPositionFinal zPosition, p.Source
 			FROM
 			 	HotspotNelPanorama hp,
 				Hotspot h
