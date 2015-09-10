@@ -451,12 +451,16 @@ function makeHotspot(position, id, initialPosition) {
                 map: THREE.ImageUtils.loadTexture('images/pano_icon_vertical.png')
             })
         ];
-
     }
     else {
-        var materials1 = [
+        /*var materials1 = [
             new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/NoPanorama.png')
+            })
+        ];*/
+        var materials1 = [
+            new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture('images/pano_icon_vertical.png')
             })
         ];
     }
@@ -487,9 +491,14 @@ function makeHotspot(position, id, initialPosition) {
     else {
         var materials2 = [
             new THREE.MeshBasicMaterial({
-                map: THREE.ImageUtils.loadTexture('images/NoGallery.png')
+                map: THREE.ImageUtils.loadTexture('images/gallery_icon_horizontal.png')
             })
         ];
+        /*var materials2 = [
+            new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture('images/NoGallery.png')
+            })
+        ];*/
     }
     var torusMaterial = new THREE.MeshFaceMaterial(materials2);
     var torus2 = new THREE.Mesh(torusGeometry, torusMaterial);
@@ -513,9 +522,14 @@ function makeHotspot(position, id, initialPosition) {
         ];
     }
     else {
-        var materials3 = [
+        /*var materials3 = [
             new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/NoPDF.png')
+            })
+        ];*/
+        var materials3 = [
+            new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture('images/pdf_icon_horizontal_reflected.png')
             })
         ];
     }
@@ -539,9 +553,14 @@ function makeHotspot(position, id, initialPosition) {
         ];
     }
     else {
-        var materials4 = [
+        /*var materials4 = [
             new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('images/NoObject.png')
+            })
+        ];*/
+        var materials4 = [
+            new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture('images/3d_icon_horizontal.png')
             })
         ];
     }
