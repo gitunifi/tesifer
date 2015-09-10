@@ -22,8 +22,7 @@
     function login(){
         if($("#username").val().trim() != "" && $("#password").val().trim() != ""){
             $.post( "index.php", {username: $("#username").val(), password: $("#password").val()},function( ok ) {
-                console.log(ok == false);
-                if(ok == "false"){
+                if(ok == false){
                     $(".errLogin").css({"display":"inherit"});
                     setTimeout(function() {$(".errLogin").hide();}, 6000);
                 } else {
