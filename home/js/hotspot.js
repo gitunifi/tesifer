@@ -14,7 +14,7 @@ function getHotspot() {
         var finalPosition = new THREE.Vector3(parseInt(hotspot['xPositionFinal']*210), parseInt(hotspot['yPositionFinal']*210), parseInt(hotspot['zPositionFinal']*210));
         makeHotspot(finalPosition, hotspot['IdHotspot'], position);
     }
-
+console.log(open);
     if (open) {
         open = false;
         for (var i = 0; i < markers.length; i++) {
