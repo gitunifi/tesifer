@@ -1,4 +1,4 @@
-<link href="components/bootstrap/dist/css/bootstrap.min.css">
+<link href="components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
     body {
         padding-top: 0px;
@@ -583,7 +583,7 @@
         </form>
     </div>
 </div>
-
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script>
     function login(){
         if($("#username").val().trim() != "" && $("#password").val().trim() != ""){
