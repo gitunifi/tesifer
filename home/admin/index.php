@@ -6,8 +6,10 @@ if (!isset($_SESSION["logged"])) {
     if (isset($_POST["username"]) && isset($_POST["password"])) {
         if ($_POST["username"] == "tesifer" && $_POST["password" == "tesifer"]) {
             $_SESSION["logged"] = "1";
+            echo "true";
+            exit;
         } else {
-            header("Location: login.php");
+            echo "false";
             exit;
         }
     } else {

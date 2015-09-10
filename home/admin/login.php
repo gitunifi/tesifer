@@ -22,11 +22,11 @@
     function login(){
         if($("#username").val().trim() != "" && $("#password").val().trim() != ""){
             $.post( "index.php", $("#formLogin").serialize(),function( ok ) {
-                if(ok == false){
+                if(ok == "false"){
                     $(".errLogin").css({"display":"inherit"});
                     setTimeout(function() {$(".errLogin").hide();}, 6000);
                 } else {
-                    location.reload();
+                    location.href = "index.php";
                 }
             }, "json");
         } else {
