@@ -15,11 +15,14 @@ function getHotspot() {
         makeHotspot(finalPosition, hotspot['IdHotspot'], position);
     }
 
-    for (var i = 0; i < markers.length ; i++ ) {
-        if (markers[i].name == "PDF") {
-            interactiveObject = markers[i];
-            manageHotspot();
-            return;
+    if (open) {
+        open = false;
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i].name == "PDF") {
+                interactiveObject = markers[i];
+                manageHotspot();
+                return;
+            }
         }
     }
 }
