@@ -20,10 +20,10 @@ function getHotspot() {
         for (var i = 0; i < markers.length; i++) {
             if (markers[i].name == "PDF") {
                 interactiveObject = markers[i];
+
+                var response = XYZtoLonLat(markers[i].position.x, markers[i].position.y, markers[i].position.z);
+                smoothLonLatTransition(response[0], response[1], 3);
                 setTimeout(function() {
-                    camera.target.x = markers[i].position.x;
-                    camera.target.y = markers[i].position.y;
-                    camera.target.z = markers[i].position.z;
                     manageHotspot();
                 }, 1000);
 
